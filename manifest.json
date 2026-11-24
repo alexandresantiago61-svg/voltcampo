@@ -2,7 +2,7 @@
   "id": "./",
   "name": "VoltCampo - GMN Carvalho Engenharia",
   "short_name": "VoltCampo",
-  "description": "Calculadora eletrica de campo offline baseada na NBR 5410.",
+  "description": "Calculadora elétrica de campo offline baseada na NBR 5410.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
@@ -12,13 +12,13 @@
   "lang": "pt-BR",
   "icons": [
     {
-      "src": "icon-512.png",
-      "sizes": "512x512",
+      "src": "ícone-512.png",
+      "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icon-512.png",
+      "src": "ícone-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
