@@ -12,10 +12,10 @@
   "lang": "pt-BR",
   "icons": [
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='96' fill='%230f172a'/%3E%3Cpath d='M288 76L136 280h108l-20 156 152-204H268l20-156z' fill='%2338bdf8'/%3E%3C/svg%3E",
+      "src": "ícone-512.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }
