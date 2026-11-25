@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1e3a8a">
+    <title>VoltSinal - Automação e Sinais</title>
+    <link rel="manifest" href="manifest-voltsinal.json">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --border: #334155;
+            --primary: #2563eb;
+            --accent: #f59e0b;
+            --cyan: #38bdf8;
+            --success: #10b981;
+            --danger: #ef4444;
+            --text: #f8fafc;
+            --muted: #94a3b8;
+        }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, Arial, sans-serif; }
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            padding-bottom: 40px;
+        }
+        header {
+            background: linear-gradient(135deg, #1e3a8a, #0f172a);
+            padding: 16px;
+            border-bottom: 2px solid var(--accent);
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 20px;
+            color: var(--accent);
+            letter-spacing: 0.5px;
+        }
+        header small { color: var(--muted); font-size: 12px; display: block; }
+        .badge-offline {
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 20px;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            font-weight: bold;
+        }
+        .tabs {
+            display: flex;
+            background: #1e293b;
+            border-bottom: 1px solid var(--border);
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 12px 6px;
+            background: none;
+            border: none;
+            color: var(--muted);
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+        .tab-btn.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+            background: rgba(245, 158, 11, 0.08);
+        }
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 14px;
+        }
+        .section { display: none; }
+        .section.active { display: block; }
+        .topic-banner {
+            width: 100%;
+            max-height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            margin-bottom: 14px;
+            display: block;
+        }
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 14px;
+        }
+        .card h2 {
+            margin: 0 0 12px 0;
+            font-size: 14px;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 6px;
+        }
+        .row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .col { flex: 1; min-width: 110px; }
+        label {
+            display: block;
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: #0f172a;
+            color: var(--text);
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 6px;
+        }
+        .res-box {
+            background: #0f172a;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+        .res-box.highlight {
+            border-color: var(--accent);
+            background: rgba(245, 158, 11, 0.08);
+        }
+        .res-label {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+        }
+        .res-val {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--cyan);
+            margin-top: 4px;
+        }
+        .res-box.highlight .res-val { color: var(--accent); }
+        .bar-wrap {
+            width: 100%;
+            height: 12px;
+            background: #0f172a;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            margin: 10px 0 4px;
+        }
+        .bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary), var(--cyan), var(--accent));
+            transition: width 0.2s;
+        }
+        .alert-box {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: bold;
+            display: none;
+        }
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid var(--danger);
+            color: #fca5a5;
+        }
+        .alert-ok {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid var(--success);
+            color: #6ee7b7;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 6px;
+        }
+        th, td {
+            padding: 8px 6px;
+            border-bottom: 1px solid var(--border);
+            text-align: center;
+        }
+        th {
+            color: var(--accent);
+            font-size: 12px;
+            background: #0f172a;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 11px 14px;
+            border-radius: 8px;
+            border: none;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            color: #fff;
+            width: 100%;
+            margin-top: 8px;
+        }
+        .btn-success { background: var(--success); }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--success);
+            color: #fff;
+            padding: 10px 18px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 14px;
+            display: none;
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div>
+        <h1>⚡ VoltSinal</h1>
+        <small>Automação, Instrumentação e Controle</small>
+    </div>
+    <span class="badge-offline">OFFLINE</span>
+</header>
+
+<div class="tabs">
+    <button class="tab-btn active" onclick="openTab('tab-analog', this)">4-20mA / 0-10V</button>
+    <button class="tab-btn" onclick="openTab('tab-pt100', this)">PT100 / PT1000</button>
+    <button class="tab-btn" onclick="openTab('tab-inv', this)">Inversor Hz↔RPM</button>
+</div>
+
+<div class="container">
+
+    <!-- ABA 1: SINAIS ANALÓGICOS -->
+    <div id="tab-analog" class="section active">
+        <img src="banner-analogico.png" class="topic-banner" alt="Sinais Analógicos" onerror="this.style.display='none'">
+
+        <div class="card">
+            <h2>Configuração do Transmissor / Sensor</h2>
+            <div class="row">
+                <div class="col">
+                    <label>Tipo de Sinal</label>
+                    <select id="sig-type" onchange="calcFromSignal()">
+                        <option value="4-20">4 a 20 mA</option>
+                        <option value="0-10">0 a 10 V</option>
+                        <option value="0-20">0 a 20 mA</option>
+                        <option value="1-5">1 a 5 V</option>
+                        <option value="2-10">2 a 10 V</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label>Unidade</label>
+                    <select id="sig-unit" onchange="calcFromSignal()">
+                        <option value="bar">bar</option>
+                        <option value="°C">°C</option>
+                        <option value="%">%</option>
+                        <option value="m³/h">m³/h</option>
+                        <option value="PSI">PSI</option>
+                        <option value="mmH2O">mmH2O</option>
+                        <option value="m">metros</option>
+                        <option value="RPM">RPM</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label>Início da Faixa (LRV - 0%)</label>
+                    <input type="number" id="sig-lrv" value="0" step="any" oninput="calcFromSignal()">
+                </div>
+                <div class="col">
+                    <label>Fim da Faixa (URV - 100%)</label>
+                    <input type="number" id="sig-urv" value="10" step="any" oninput="calcFromSignal()">
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Conversão em Tempo Real</h2>
+            <div class="row">
+                <div class="col">
+                    <label id="lbl-in-sig">Leitura do Multímetro (mA)</label>
+                    <input type="number" id="in-sig" value="12" step="any" oninput="calcFromSignal()">
+                </div>
+                <div class="col">
+                    <label id="lbl-in-proc">Valor do Processo (bar)</label>
+                    <input type="number" id="in-proc" value="5" step="any" oninput="calcFromProcess()">
+                </div>
+            </div>
+
+            <div class="bar-wrap"><div class="bar-fill" id="sig-bar"></div></div>
+
+            <div class="result-grid">
+                <div class="res-box highlight">
+                    <div class="res-label">Percentual</div>
+                    <div class="res-val" id="res-pct">50.0%</div>
+                </div>
+                <div class="res-box">
+                    <div class="res-label">CLP Siemens (0-27648)</div>
+                    <div class="res-val" id="res-siemens">13824</div>
+                </div>
+                <div class="res-box">
+                    <div class="res-label">CLP 12-bit (0-4095)</div>
+                    <div class="res-val" id="res-12bit">2048</div>
+                </div>
+                <div class="res-box">
+                    <div class="res-label">CLP 15-bit (0-32767)</div>
+                    <div class="res-val" id="res-15bit">16384</div>
+                </div>
+            </div>
+
+            <div id="sig-alert" class="alert-box"></div>
+            <button class="btn btn-success" onclick="shareAnalog()">💬 Enviar Leitura no WhatsApp</button>
+        </div>
+
+        <div class="card">
+            <h2>Tabela de Calibração (5 Pontos)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>%</th>
+                        <th id="th-sig">Sinal (mA)</th>
+                        <th id="th-proc">Processo (bar)</th>
+                        <th>Siemens</th>
+                    </tr>
+                </thead>
+                <tbody id="cal-table"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ABA 2: PT100 / PT1000 -->
+    <div id="tab-pt100" class="section">
+        <img src="banner-pt100.png" class="topic-banner" alt="Sensor PT100" onerror="this.style.display='none'">
+
+        <div class="card">
+            <h2>Conversor RTD (Norma IEC 60751)</h2>
+            <label>Tipo do Sensor</label>
+            <select id="pt-type" onchange="calcFromOhms()">
+                <option value="100">PT100 (100 Ω a 0°C)</option>
+                <option value="1000">PT1000 (1000 Ω a 0°C)</option>
+            </select>
+
+            <div class="row">
+                <div class="col">
+                    <label>Resistência Medida (Ω)</label>
+                    <input type="number" id="in-ohms" value="109.73" step="any" oninput="calcFromOhms()">
+                </div>
+                <div class="col">
+                    <label>Temperatura (°C)</label>
+                    <input type="number" id="in-tempc" value="25" step="any" oninput="calcFromTemp()">
+                </div>
+            </div>
+
+            <div class="result-grid">
+                <div class="res-box highlight">
+                    <div class="res-label">Temperatura (°C)</div>
+                    <div class="res-val" id="res-pt-c">25.0 °C</div>
+                </div>
+                <div class="res-box">
+                    <div class="res-label">Fahrenheit (°F)</div>
+                    <div class="res-val" id="res-pt-f">77.0 °F</div>
+                </div>
+            </div>
+
+            <div id="pt-alert" class="alert-box"></div>
+            <button class="btn btn-success" onclick="sharePT100()">💬 Enviar Leitura no WhatsApp</button>
+        </div>
+
+        <div class="card">
+            <h2>Tabela Rápida de Bancada</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Temperatura</th>
+                        <th>PT100 (Ω)</th>
+                        <th>PT1000 (Ω)</th>
+                    </tr>
+                </thead>
+                <tbody id="pt-table"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ABA 3: INVERSOR DE FREQUÊNCIA -->
+    <div id="tab-inv" class="section">
+        <img src="banner-inversor.png" class="topic-banner" alt="Inversor de Frequência" onerror="this.style.display='none'">
+
+        <div class="card">
+            <h2>Dados do Motor / Inversor</h2>
+            <div class="row">
+                <div class="col">
+                    <label>Nº de Polos</label>
+                    <select id="inv-polos" onchange="calcFromHz()">
+                        <option value="2">2 Polos (3600 RPM)</option>
+                        <option value="4" selected>4 Polos (1800 RPM)</option>
+                        <option value="6">6 Polos (1200 RPM)</option>
+                        <option value="8">8 Polos (900 RPM)</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label>Freq. Nominal (Hz)</label>
+                    <select id="inv-fnom" onchange="calcFromHz()">
+                        <option value="60" selected>60 Hz (Brasil)</option>
+                        <option value="50">50 Hz</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label>Escorregamento (%)</label>
+                    <input type="number" id="inv-slip" value="2.5" step="0.1" min="0" max="15" oninput="calcFromHz()">
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Conversão Frequência ↔ Rotação</h2>
+            <div class="row">
+                <div class="col">
+                    <label>Frequência no Inversor (Hz)</label>
+                    <input type="number" id="in-hz" value="45" step="any" oninput="calcFromHz()">
+                </div>
+                <div class="col">
+                    <label>Rotação Real Desejada (RPM)</label>
+                    <input type="number" id="in-rpm" value="1316" step="any" oninput="calcFromRPM()">
+                </div>
+            </div>
+
+            <div class="result-grid">
+                <div class="res-box highlight">
+                    <div class="res-label">RPM Real (c/ Escorreg.)</div>
+                    <div class="res-val" id="res-rpm-real">1316 RPM</div>
+                </div>
+                <div class="res-box">
+                    <div class="res-label">RPM Síncrona</div>
+                    <div class="res-val" id="res-rpm-sync">1350 RPM</div>
+                </div>
+                <div class="res-box">
+                    <div class="res-label">Ref. Analógica (4-20mA)</div>
+                    <div class="res-val" id="res-inv-ma">16.00 mA</div>
+                </div>
+                <div class="res-box">
+                    <div class="res-label">Ref. Analógica (0-10V)</div>
+                    <div class="res-val" id="res-inv-v">7.50 V</div>
+                </div>
+            </div>
+
+            <button class="btn btn-success" onclick="shareInv()">💬 Enviar Cálculo no WhatsApp</button>
+        </div>
+    </div>
+
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+function openTab(tabId, btn) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    btn.classList.add('active');
+}
+
+// --- 1. SINAIS ANALÓGICOS ---
+function getSigSpec() {
+    const type = document.getElementById('sig-type').value;
+    const map = {
+        '4-20': { min: 4, max: 20, unit: 'mA' },
+        '0-10': { min: 0, max: 10, unit: 'V' },
+        '0-20': { min: 0, max: 20, unit: 'mA' },
+        '1-5':  { min: 1, max: 5,  unit: 'V' },
+        '2-10': { min: 2, max: 10, unit: 'V' }
+    };
+    return map[type];
+}
+
+function updateAnalogUI(sigVal, procVal, pct) {
+    const spec = getSigSpec();
+    const pUnit = document.getElementById('sig-unit').value;
+    const lrv = parseFloat(document.getElementById('sig-lrv').value) || 0;
+    const urv = parseFloat(document.getElementById('sig-urv').value) || 100;
+
+    document.getElementById('lbl-in-sig').innerText = `Leitura do Multímetro (${spec.unit})`;
+    document.getElementById('lbl-in-proc').innerText = `Valor do Processo (${pUnit})`;
+    document.getElementById('th-sig').innerText = `Sinal (${spec.unit})`;
+    document.getElementById('th-proc').innerText = `Processo (${pUnit})`;
+
+    document.getElementById('res-pct').innerText = `${(pct * 100).toFixed(1)}%`;
+    document.getElementById('res-siemens').innerText = Math.round(pct * 27648);
+    document.getElementById('res-12bit').innerText = Math.round(pct * 4095);
+    document.getElementById('res-15bit').innerText = Math.round(pct * 32767);
+
+    const clampPct = Math.max(0, Math.min(100, pct * 100));
+    document.getElementById('sig-bar').style.width = `${clampPct}%`;
+
+    // Alerta de diagnóstico
+    const alertEl = document.getElementById('sig-alert');
+    if (spec.min > 0 && sigVal < spec.min * 0.9) {
+        alertEl.className = 'alert-box alert-danger';
+        alertEl.innerText = `⚠️ Alerta: Sinal abaixo de ${spec.min}${spec.unit}. Possível cabo rompido, fusível aberto ou transmissor sem alimentação.`;
+        alertEl.style.display = 'block';
+    } else if (sigVal > spec.max * 1.03) {
+        alertEl.className = 'alert-box alert-danger';
+        alertEl.innerText = `⚠️ Alerta: Sinal acima de ${spec.max}${spec.unit}. Possível sobrepressão/estouro de faixa ou curto no loop.`;
+        alertEl.style.display = 'block';
+    } else {
+        alertEl.className = 'alert-box alert-ok';
+        alertEl.innerText = `✅ Sinal dentro da faixa normal de operação (${spec.min} a ${spec.max} ${spec.unit}).`;
+        alertEl.style.display = 'block';
+    }
+
+    // Tabela 5 pontos
+    const pts = [0, 0.25, 0.5, 0.75, 1];
+    document.getElementById('cal-table').innerHTML = pts.map(p => {
+        const s = spec.min + p * (spec.max - spec.min);
+        const v = lrv + p * (urv - lrv);
+        const siem = Math.round(p * 27648);
+        return `<tr>
+            <td><b>${p * 100}%</b></td>
+            <td>${s.toFixed(2)} ${spec.unit}</td>
+            <td>${v.toFixed(2)} ${pUnit}</td>
+            <td>${siem}</td>
+        </tr>`;
+    }).join('');
+}
+
+function calcFromSignal() {
+    const spec = getSigSpec();
+    const lrv = parseFloat(document.getElementById('sig-lrv').value) || 0;
+    const urv = parseFloat(document.getElementById('sig-urv').value) || 0;
+    const sigVal = parseFloat(document.getElementById('in-sig').value);
+    if (isNaN(sigVal)) return;
+
+    const pct = (sigVal - spec.min) / (spec.max - spec.min);
+    const procVal = lrv + pct * (urv - lrv);
+    document.getElementById('in-proc').value = procVal.toFixed(2);
+    updateAnalogUI(sigVal, procVal, pct);
+}
+
+function calcFromProcess() {
+    const spec = getSigSpec();
+    const lrv = parseFloat(document.getElementById('sig-lrv').value) || 0;
+    const urv = parseFloat(document.getElementById('sig-urv').value) || 0;
+    const procVal = parseFloat(document.getElementById('in-proc').value);
+    if (isNaN(procVal) || urv === lrv) return;
+
+    const pct = (procVal - lrv) / (urv - lrv);
+    const sigVal = spec.min + pct * (spec.max - spec.min);
+    document.getElementById('in-sig').value = sigVal.toFixed(2);
+    updateAnalogUI(sigVal, procVal, pct);
+}
+
+function shareAnalog() {
+    const spec = getSigSpec();
+    const unit = document.getElementById('sig-unit').value;
+    const lrv = document.getElementById('sig-lrv').value;
+    const urv = document.getElementById('sig-urv').value;
+    const sig = document.getElementById('in-sig').value;
+    const proc = document.getElementById('in-proc').value;
+    const pct = document.getElementById('res-pct').innerText;
+    const txt = `*VoltSinal - Leitura Analógica*\nFaixa: ${lrv} a ${urv} ${unit} (${spec.min}-${spec.max}${spec.unit})\nSinal: *${sig} ${spec.unit}*\nProcesso: *${proc} ${unit}* (${pct})`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+}
+
+// --- 2. PT100 / PT1000 (IEC 60751) ---
+const PT_A = 3.9083e-3;
+const PT_B = -5.775e-7;
+const PT_C = -4.183e-12;
+
+function tempToOhms(t, r0) {
+    if (t >= 0) {
+        return r0 * (1 + PT_A * t + PT_B * t * t);
+    } else {
+        return r0 * (1 + PT_A * t + PT_B * t * t + PT_C * (t - 100) * t * t * t);
+    }
+}
+
+function ohmsToTemp(r, r0) {
+    // Newton-Raphson preciso de -200°C a +850°C
+    let t = (r - r0) / (r0 * PT_A);
+    for (let i = 0; i < 12; i++) {
+        const f = tempToOhms(t, r0) - r;
+        const df = t >= 0
+            ? r0 * (PT_A + 2 * PT_B * t)
+            : r0 * (PT_A + 2 * PT_B * t + PT_C * (4 * t * t * t - 300 * t * t));
+        t = t - f / df;
+    }
+    return t;
+}
+
+function updatePTAlert(t) {
+    const el = document.getElementById('pt-alert');
+    if (t < -200 || t > 850) {
+        el.className = 'alert-box alert-danger';
+        el.innerText = '⚠️ Fora da faixa padrão IEC 60751 (-200°C a +850°C). Verifique cabo aberto ou curto.';
+        el.style.display = 'block';
+    } else {
+        el.className = 'alert-box alert-ok';
+        el.innerText = '✅ Leitura dentro da curva IEC 60751 (α = 0,00385).';
+        el.style.display = 'block';
+    }
+}
+
+function calcFromOhms() {
+    const r0 = parseFloat(document.getElementById('pt-type').value);
+    const r = parseFloat(document.getElementById('in-ohms').value);
+    if (isNaN(r) || r <= 0) return;
+
+    const t = ohmsToTemp(r, r0);
+    document.getElementById('in-tempc').value = t.toFixed(1);
+    document.getElementById('res-pt-c').innerText = `${t.toFixed(1)} °C`;
+    document.getElementById('res-pt-f').innerText = `${(t * 9 / 5 + 32).toFixed(1)} °F`;
+    updatePTAlert(t);
+}
+
+function calcFromTemp() {
+    const r0 = parseFloat(document.getElementById('pt-type').value);
+    const t = parseFloat(document.getElementById('in-tempc').value);
+    if (isNaN(t)) return;
+
+    const r = tempToOhms(t, r0);
+    document.getElementById('in-ohms').value = r.toFixed(2);
+    document.getElementById('res-pt-c').innerText = `${t.toFixed(1)} °C`;
+    document.getElementById('res-pt-f').innerText = `${(t * 9 / 5 + 32).toFixed(1)} °F`;
+    updatePTAlert(t);
+}
+
+function buildPTTable() {
+    const temps = [-20, 0, 25, 50, 100, 150, 200, 300];
+    document.getElementById('pt-table').innerHTML = temps.map(t => `
+        <tr>
+            <td><b>${t} °C</b></td>
+            <td>${tempToOhms(t, 100).toFixed(2)} Ω</td>
+            <td>${tempToOhms(t, 1000).toFixed(1)} Ω</td>
+        </tr>
+    `).join('');
+}
+
+function sharePT100() {
+    const tipo = document.getElementById('pt-type').value === '100' ? 'PT100' : 'PT1000';
+    const r = document.getElementById('in-ohms').value;
+    const t = document.getElementById('res-pt-c').innerText;
+    const txt = `*VoltSinal - Leitura ${tipo}*\nResistência: *${r} Ω*\nTemperatura: *${t}*`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+}
+
+// --- 3. INVERSOR DE FREQUÊNCIA ---
+function updateInvOutputs(hz) {
+    const polos = parseFloat(document.getElementById('inv-polos').value);
+    const fnom = parseFloat(document.getElementById('inv-fnom').value);
+    const slip = (parseFloat(document.getElementById('inv-slip').value) || 0) / 100;
+
+    const rpmSync = (120 * hz) / polos;
+    const rpmReal = rpmSync * (1 - slip);
+    const ratio = hz / fnom;
+    const ma = 4 + ratio * 16;
+    const v = ratio * 10;
+
+    document.getElementById('res-rpm-real').innerText = `${Math.round(rpmReal)} RPM`;
+    document.getElementById('res-rpm-sync').innerText = `${Math.round(rpmSync)} RPM`;
+    document.getElementById('res-inv-ma').innerText = `${ma.toFixed(2)} mA`;
+    document.getElementById('res-inv-v').innerText = `${v.toFixed(2)} V`;
+    return rpmReal;
+}
+
+function calcFromHz() {
+    const hz = parseFloat(document.getElementById('in-hz').value);
+    if (isNaN(hz) || hz < 0) return;
+    const rpmReal = updateInvOutputs(hz);
+    document.getElementById('in-rpm').value = Math.round(rpmReal);
+}
+
+function calcFromRPM() {
+    const rpmReal = parseFloat(document.getElementById('in-rpm').value);
+    const polos = parseFloat(document.getElementById('inv-polos').value);
+    const slip = (parseFloat(document.getElementById('inv-slip').value) || 0) / 100;
+    if (isNaN(rpmReal) || rpmReal < 0 || slip >= 1) return;
+
+    const rpmSync = rpmReal / (1 - slip);
+    const hz = (rpmSync * polos) / 120;
+    document.getElementById('in-hz').value = hz.toFixed(1);
+    updateInvOutputs(hz);
+}
+
+function shareInv() {
+    const polos = document.getElementById('inv-polos').value;
+    const hz = document.getElementById('in-hz').value;
+    const rpm = document.getElementById('res-rpm-real').innerText;
+    const ma = document.getElementById('res-inv-ma').innerText;
+    const v = document.getElementById('res-inv-v').innerText;
+    const txt = `*VoltSinal - Inversor de Frequência*\nMotor: ${polos} Polos\nFrequência: *${hz} Hz*\nRotação Real: *${rpm}*\nReferência: ${ma} / ${v}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+}
+
+// --- INICIALIZAÇÃO ---
+window.addEventListener('DOMContentLoaded', () => {
+    calcFromSignal();
+    calcFromOhms();
+    buildPTTable();
+    calcFromHz();
+});
+
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+
+</body>
+</html>
