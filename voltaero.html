@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1e3a8a">
     <title>VoltAero - Ação Elétrica no Ar</title>
+    <link rel="manifest" href="manifest-voltaero.json">
     <style>
-            <link rel="manifest" href="manifest-voltaero.json">
-
         * {
             box-sizing: border-box;
             user-select: none;
@@ -51,6 +51,7 @@
             font-weight: bold;
             text-shadow: 2px 2px #000;
             z-index: 10;
+            pointer-events: none;
         }
         #battery-bar {
             width: 100px;
@@ -160,7 +161,6 @@ const menu = document.getElementById('menu');
 const gameOverScreen = document.getElementById('game-over');
 const finalScore = document.getElementById('final-score');
 
-// Ajuste automático do canvas
 function resize() {
     canvas.width = canvas.parentElement.clientWidth;
     canvas.height = canvas.parentElement.clientHeight;
@@ -173,7 +173,6 @@ let score = 0;
 let battery = 100;
 let pressing = false;
 
-// Jogador (Avião)
 const player = {
     x: 50,
     y: 200,
@@ -184,18 +183,16 @@ const player = {
     thrust: -0.5
 };
 
-// Listas de obstáculos e colecionáveis
 let obstacles = [];
 let items = [];
 let particles = [];
 let frameCount = 0;
 
-// Captura de toques na tela e cliques do mouse
+// Controles no canvas para não travar os botões do menu
 canvas.addEventListener('touchstart', (e) => { e.preventDefault(); pressing = true; }, { passive: false });
 window.addEventListener('touchend', () => { pressing = false; });
 canvas.addEventListener('mousedown', () => { pressing = true; });
 window.addEventListener('mouseup', () => { pressing = false; });
-
 
 function startGame() {
     menu.style.display = 'none';
@@ -221,18 +218,20 @@ function resetData() {
     items = [];
     particles = [];
     frameCount = 0;
+    scoreVal.innerText = '0m';
+    batteryFill.style.width = '100%';
 }
 
 function triggerGameOver() {
     gameActive = false;
+    pressing = false;
     finalScore.innerText = score + 'm';
     gameOverScreen.style.display = 'flex';
 }
 
 function spawnEntities() {
     frameCount++;
-    
-    // Gera nuvens de tempestade (obstáculos)
+
     if (frameCount % 90 === 0) {
         const size = Math.random() * 40 + 30;
         obstacles.push({
@@ -244,7 +243,6 @@ function spawnEntities() {
         });
     }
 
-    // Gera baterias (energia)
     if (frameCount % 120 === 0) {
         items.push({
             x: canvas.width,
@@ -257,7 +255,6 @@ function spawnEntities() {
 }
 
 function drawBackground() {
-    // Desenha nuvens de fundo distantes
     ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
     ctx.beginPath();
     ctx.arc(100, 150, 40, 0, Math.PI * 2);
@@ -274,10 +271,8 @@ function drawBackground() {
 function drawPlayer() {
     ctx.save();
     ctx.translate(player.x + player.width / 2, player.y + player.height / 2);
-    // Inclina o avião de acordo com a velocidade de subida/descida
     ctx.rotate(player.vy * 0.05);
 
-    // Corpo do Avião (Amarelo e Azul)
     ctx.fillStyle = '#fbbf24';
     ctx.beginPath();
     ctx.ellipse(0, 0, 25, 12, 0, 0, Math.PI * 2);
@@ -288,7 +283,6 @@ function drawPlayer() {
     ctx.ellipse(-5, 0, 20, 12, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Hélice girando (efeito)
     ctx.strokeStyle = '#e2e8f0';
     ctx.lineWidth = 3;
     ctx.beginPath();
@@ -296,11 +290,9 @@ function drawPlayer() {
     ctx.lineTo(25, 15);
     ctx.stroke();
 
-    // Asa do avião
     ctx.fillStyle = '#ef4444';
     ctx.fillRect(-10, 0, 12, 18);
 
-    // Cabine
     ctx.fillStyle = '#38bdf8';
     ctx.beginPath();
     ctx.arc(3, -5, 6, 0, Math.PI * 2);
@@ -308,7 +300,6 @@ function drawPlayer() {
 
     ctx.restore();
 
-    // Rastro de fumaça/faísca
     if (Math.random() > 0.4) {
         particles.push({
             x: player.x,
@@ -339,27 +330,22 @@ function updateParticles() {
 }
 
 function handlePhysics() {
-    // Aplica impulso para subir ou gravidade para descer
     if (pressing) {
         player.vy += player.thrust;
     } else {
         player.vy += player.gravity;
     }
-    
-    // Limita velocidade máxima
+
     player.vy = Math.max(-5, Math.min(5, player.vy));
     player.y += player.vy;
 
-    // Limites de tela
     if (player.y < 0) { player.y = 0; player.vy = 0; }
     if (player.y + player.height > canvas.height) { triggerGameOver(); }
 
-    // Consumo constante de bateria
     battery -= 0.07;
     batteryFill.style.width = Math.max(0, battery) + '%';
     if (battery <= 0) { triggerGameOver(); }
 
-    // Aumenta a distância (pontuação)
     if (frameCount % 10 === 0) {
         score++;
         scoreVal.innerText = score + 'm';
@@ -377,19 +363,17 @@ function animate() {
     if (!gameActive) return;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
+
     drawBackground();
     spawnEntities();
     handlePhysics();
     updateParticles();
     drawPlayer();
 
-    // Processa os obstáculos (Nuvens de Tempestade)
     for (let i = obstacles.length - 1; i >= 0; i--) {
         const obs = obstacles[i];
         obs.x -= obs.speed;
 
-        // Desenho da Nuvem de Tempestade com faísca
         ctx.fillStyle = '#475569';
         ctx.beginPath();
         ctx.arc(obs.x, obs.y, obs.width/2, 0, Math.PI*2);
@@ -397,7 +381,6 @@ function animate() {
         ctx.arc(obs.x - 10, obs.y - 5, obs.width/2.5, 0, Math.PI*2);
         ctx.fill();
 
-        // Detalhe de raio na nuvem
         ctx.fillStyle = '#fbbf24';
         ctx.beginPath();
         ctx.moveTo(obs.x - 5, obs.y + 5);
@@ -415,18 +398,15 @@ function animate() {
         }
     }
 
-    // Processa os itens (Baterias)
     for (let i = items.length - 1; i >= 0; i--) {
         const item = items[i];
         item.x -= item.speed;
 
-        // Desenho da bateria (Ícone)
-        ctx.fillStyle = '#10b981'; // Corpo verde
+        ctx.fillStyle = '#10b981';
         ctx.fillRect(item.x, item.y, item.width, item.height);
-        ctx.fillStyle = '#e2e8f0'; // Tampinha
+        ctx.fillStyle = '#e2e8f0';
         ctx.fillRect(item.x + 5, item.y - 4, item.width - 10, 4);
-        
-        // Símbolo do raio na bateria
+
         ctx.fillStyle = '#fbbf24';
         ctx.beginPath();
         ctx.moveTo(item.x + 12, item.y + 8);
@@ -439,8 +419,7 @@ function animate() {
         ctx.fill();
 
         if (checkCollisions(item, item.width, item.height)) {
-            battery = Math.min(100, battery + 25); // Carrega a energia
-            // Cria faíscas verdes ao coletar
+            battery = Math.min(100, battery + 25);
             for (let p = 0; p < 8; p++) {
                 particles.push({
                     x: item.x,
@@ -462,9 +441,11 @@ function animate() {
 
     requestAnimationFrame(animate);
 }
+
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+}
 </script>
 
 </body>
 </html>
-
-       
