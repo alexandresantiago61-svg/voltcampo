@@ -1,7 +1,7 @@
 {
-  "id": "./voltaero.html",
-  "name": "voltaero - Ação Elétrica no Ar",
-  "short_name": "voltaero",
+  "id": "./Voltaero.html",
+  "name": "VoltAero - Ação Elétrica no Ar",
+  "short_name": "VoltAero",
   "description": "Jogo de ação elétrica no ar da GMN Carvalho Engenharia.",
   "start_url": "./Voltaero.html",
   "scope": "./",
@@ -12,7 +12,7 @@
   "lang": "pt-BR",
   "icons": [
     {
-      "src": "ícone-512.png",
+      "src": "%C3%ADcone-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
