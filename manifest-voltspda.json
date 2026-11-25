@@ -1,0 +1,21 @@
+{
+  "id": "./voltspda.html",
+  "name": "VoltSPDA - Inspeção e Laudo SPDA",
+  "short_name": "VoltSPDA",
+  "description": "Levantamento e inspeção de SPDA (NBR 5419) com checklist, medições, fotos, assinatura e PDF A4 offline.",
+  "start_url": "./voltspda.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#1e3a8a",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "icone-voltspda.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
