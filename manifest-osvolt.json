@@ -1,0 +1,21 @@
+{
+  "id": "./osvolt.html",
+  "name": "OSVolt - Ordem de Serviço",
+  "short_name": "OSVolt",
+  "description": "Ordem de serviço em campo com fotos, assinatura na tela e PDF.",
+  "start_url": "./osvolt.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#1e3a8a",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "icone-orcavolt.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
