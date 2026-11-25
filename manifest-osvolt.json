@@ -12,7 +12,7 @@
   "lang": "pt-BR",
   "icons": [
     {
-      "src": "icone-orcavolt.png",
+      "src": "icone-osvolt.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
