@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1e3a8a">
+    <title>VoltEsquema - Ligações Elétricas</title>
+    <link rel="manifest" href="manifest-voltesquema.json">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --border: #334155;
+            --primary: #2563eb;
+            --accent: #f59e0b;
+            --cyan: #38bdf8;
+            --success: #10b981;
+            --danger: #ef4444;
+            --text: #f8fafc;
+            --muted: #94a3b8;
+        }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, Arial, sans-serif; }
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            padding-bottom: 40px;
+        }
+        header {
+            background: linear-gradient(135deg, #1e3a8a, #0f172a);
+            padding: 16px;
+            border-bottom: 2px solid var(--accent);
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 20px;
+            color: var(--accent);
+            letter-spacing: 0.5px;
+        }
+        header small { color: var(--muted); font-size: 12px; display: block; }
+        .badge-offline {
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 20px;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            font-weight: bold;
+        }
+        .tabs {
+            display: flex;
+            overflow-x: auto;
+            background: #1e293b;
+            border-bottom: 1px solid var(--border);
+            scrollbar-width: none;
+        }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab-btn {
+            flex: 0 0 auto;
+            padding: 12px 14px;
+            background: none;
+            border: none;
+            color: var(--muted);
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+        }
+        .tab-btn.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+            background: rgba(245, 158, 11, 0.08);
+        }
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 14px;
+        }
+        .section { display: none; }
+        .section.active { display: block; }
+        .topic-banner {
+            width: 100%;
+            max-height: 155px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            margin-bottom: 14px;
+            display: block;
+        }
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 14px;
+        }
+        .card h2 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 6px;
+        }
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 12px;
+            font-size: 12px;
+            background: #0f172a;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        .leg-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .dot {
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .svg-wrap {
+            background: #091020;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px;
+            margin-bottom: 12px;
+            overflow-x: auto;
+        }
+        .svg-wrap svg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        ol.steps {
+            margin: 0;
+            padding-left: 18px;
+            font-size: 13.5px;
+            line-height: 1.55;
+            color: #e2e8f0;
+        }
+        ol.steps li { margin-bottom: 6px; }
+        .tip-box {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            line-height: 1.45;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            color: #e0f2fe;
+        }
+        .warn-box {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            line-height: 1.45;
+            background: rgba(239, 68, 68, 0.14);
+            border: 1px solid rgba(239, 68, 68, 0.45);
+            color: #fecaca;
+        }
+        .sub-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .sub-btn {
+            flex: 1;
+            padding: 9px 6px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: #0f172a;
+            color: var(--muted);
+            font-weight: bold;
+            font-size: 12.5px;
+            cursor: pointer;
+        }
+        .sub-btn.active {
+            background: var(--primary);
+            border-color: var(--cyan);
+            color: #fff;
+        }
+        .sub-panel { display: none; }
+        .sub-panel.active { display: block; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 6px;
+        }
+        th, td {
+            padding: 8px 6px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+        }
+        th {
+            color: var(--accent);
+            font-size: 12px;
+            background: #0f172a;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 11px 14px;
+            border-radius: 8px;
+            border: none;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            color: #fff;
+            width: 100%;
+            margin-top: 12px;
+        }
+        .btn-success { background: var(--success); }
+    </style>
+</head>
+<body>
+
+<header>
+    <div>
+        <h1>🔌 VoltEsquema</h1>
+        <small>Guia Prático de Ligações Elétricas</small>
+    </div>
+    <span class="badge-offline">OFFLINE</span>
+</header>
+
+<div class="tabs">
+    <button class="tab-btn active" onclick="openTab('tab-way', this)">Three / Four-Way</button>
+    <button class="tab-btn" onclick="openTab('tab-vent', this)">Ventilador</button>
+    <button class="tab-btn" onclick="openTab('tab-boia', this)">Boia Elétrica</button>
+    <button class="tab-btn" onclick="openTab('tab-sensor', this)">Fotocélula / Sensor</button>
+    <button class="tab-btn" onclick="openTab('tab-qdc', this)">QDC / DR / DPS</button>
+</div>
+
+<div class="container">
+
+    <!-- LEGENDA GLOBAL NBR 5410 -->
+    <div class="legend">
+        <span class="leg-item"><i class="dot" style="background:#ef4444"></i> Fase (L)</span>
+        <span class="leg-item"><i class="dot" style="background:#38bdf8"></i> Neutro (N)</span>
+        <span class="leg-item"><i class="dot" style="background:#facc15"></i> Retorno</span>
+        <span class="leg-item"><i class="dot" style="background:#c084fc"></i> Retorno 2</span>
+        <span class="leg-item"><i class="dot" style="background:#22c55e"></i> Terra (PE)</span>
+    </div>
+
+    <!-- ABA 1: THREE-WAY E FOUR-WAY -->
+    <div id="tab-way" class="section active">
+        <img src="banner-threeway.png" class="topic-banner" alt="Three-Way e Four-Way" onerror="this.style.display='none'">
+
+        <div class="sub-tabs">
+            <button class="sub-btn active" onclick="openSub('way', 'sub-3w', this)">Three-Way (2 Pontos)</button>
+            <button class="sub-btn" onclick="openSub('way', 'sub-4w', this)">Four-Way (3+ Pontos)</button>
+        </div>
+
+        <!-- THREE-WAY -->
+        <div id="sub-3w" class="sub-panel way active">
+            <div class="card">
+                <h2>Esquema Three-Way (Paralelo)</h2>
+                <div class="svg-wrap">
+                    <svg viewBox="0 0 360 195">
+                        <!-- Rede -->
+                        <text x="8" y="22" fill="#ef4444" font-size="11" font-weight="bold">FASE (L)</text>
+                        <text x="8" y="42" fill="#38bdf8" font-size="11" font-weight="bold">NEUTRO (N)</text>
+                        <line x1="65" y1="18" x2="345" y2="18" stroke="#ef4444" stroke-width="2.5"/>
+                        <line x1="80" y1="38" x2="310" y2="38" stroke="#38bdf8" stroke-width="2.5"/>
+
+                        <!-- Fase descendo pro centro do SW1 -->
+                        <polyline points="80,18 80,115" fill="none" stroke="#ef4444" stroke-width="2.5"/>
+
+                        <!-- Interruptor 1 -->
+                        <rect x="48" y="80" width="64" height="72" rx="6" fill="#1e293b" stroke="#64748b" stroke-width="1.5"/>
+                        <text x="80" y="74" fill="#f8fafc" font-size="10" text-anchor="middle" font-weight="bold">THREE-WAY 1</text>
+                        <circle cx="80" cy="95" r="4" fill="#facc15"/>
+                        <circle cx="80" cy="116" r="4.5" fill="#ef4444"/>
+                        <circle cx="80" cy="137" r="4" fill="#c084fc"/>
+                        <text x="58" y="99" fill="#94a3b8" font-size="9">1</text>
+                        <text x="58" y="120" fill="#f8fafc" font-size="9" font-weight="bold">C</text>
+                        <text x="58" y="141" fill="#94a3b8" font-size="9">2</text>
+
+                        <!-- Viajantes entre SW1 e SW2 -->
+                        <line x1="84" y1="95" x2="216" y2="95" stroke="#facc15" stroke-width="2.5"/>
+                        <line x1="84" y1="137" x2="216" y2="137" stroke="#c084fc" stroke-width="2.5"/>
+                        <text x="150" y="89" fill="#facc15" font-size="9" text-anchor="middle">Retorno A</text>
+                        <text x="150" y="151" fill="#c084fc" font-size="9" text-anchor="middle">Retorno B</text>
+
+                        <!-- Interruptor 2 -->
+                        <rect x="188" y="80" width="64" height="72" rx="6" fill="#1e293b" stroke="#64748b" stroke-width="1.5"/>
+                        <text x="220" y="74" fill="#f8fafc" font-size="10" text-anchor="middle" font-weight="bold">THREE-WAY 2</text>
+                        <circle cx="220" cy="95" r="4" fill="#facc15"/>
+                        <circle cx="220" cy="116" r="4.5" fill="#f59e0b"/>
+                        <circle cx="220" cy="137" r="4" fill="#c084fc"/>
+                        <text x="235" y="99" fill="#94a3b8" font-size="9">1</text>
+                        <text x="235" y="120" fill="#f8fafc" font-size="9" font-weight="bold">C</text>
+                        <text x="235" y="141" fill="#94a3b8" font-size="9">2</text>
+
+                        <!-- Retorno do centro do SW2 para lâmpada -->
+                        <polyline points="224,116 310,116 310,92" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+                        <text x="275" y="111" fill="#f59e0b" font-size="9" text-anchor="middle">Retorno Lâmp.</text>
+
+                        <!-- Neutro na lâmpada -->
+                        <line x1="310" y1="38" x2="310" y2="56" stroke="#38bdf8" stroke-width="2.5"/>
+
+                        <!-- Lâmpada -->
+                        <circle cx="310" cy="74" r="18" fill="#1e293b" stroke="#facc15" stroke-width="2"/>
+                        <line x1="298" y1="62" x2="322" y2="86" stroke="#facc15" stroke-width="1.8"/>
+                        <line x1="322" y1="62" x2="298" y2="86" stroke="#facc15" stroke-width="1.8"/>
+                        <text x="310" y="182" fill="#94a3b8" font-size="10" text-anchor="middle">Ligar e desligar a mesma lâmpada de 2 pontos</text>
+                    </svg>
+                </div>
+
+                <ol class="steps">
+                    <li>Ligue a <b>Fase</b> no borne <b>CENTRAL (C)</b> do primeiro interruptor Three-Way.</li>
+                    <li>Passe <b>2 fios de retorno</b> ligando os bornes laterais (1 e 2) do primeiro interruptor diretamente nos laterais (1 e 2) do segundo.</li>
+                    <li>Do borne <b>CENTRAL (C)</b> do segundo interruptor, leve <b>1 fio de retorno</b> até o centro do bocal da lâmpada.</li>
+                    <li>Ligue o <b>Neutro</b> direto na rosca lateral da lâmpada.</li>
+                </ol>
+                <div class="warn-box">
+                    <b>Erro clássico:</b> Nunca ligue Fase e Neutro no mesmo interruptor paralelo (chamada "ligação caipira"). Além de fora de norma, pode dar curto na troca de tecla e deixar o bocal energizado com a luz apagada.
+                </div>
+            </div>
+        </div>
+
+        <!-- FOUR-WAY -->
+        <div id="sub-4w" class="sub-panel way">
+            <div class="card">
+                <h2>Esquema Four-Way (Intermediário)</h2>
+                <div class="svg-wrap">
+                    <svg viewBox="0 0 360 195">
+                        <!-- Rede -->
+                        <line x1="15" y1="18" x2="345" y2="18" stroke="#ef4444" stroke-width="2.5"/>
+                        <line x1="15" y1="36" x2="320" y2="36" stroke="#38bdf8" stroke-width="2.5"/>
+                        <text x="16" y="13" fill="#ef4444" font-size="10" font-weight="bold">FASE</text>
+                        <text x="16" y="32" fill="#38bdf8" font-size="10" font-weight="bold">NEUTRO</text>
+
+                        <!-- Fase no centro SW1 -->
+                        <polyline points="48,18 48,116" fill="none" stroke="#ef4444" stroke-width="2.5"/>
+
+                        <!-- SW1 (3W) -->
+                        <rect x="24" y="82" width="48" height="68" rx="5" fill="#1e293b" stroke="#64748b" stroke-width="1.5"/>
+                        <text x="48" y="76" fill="#f8fafc" font-size="9" text-anchor="middle" font-weight="bold">3-WAY 1</text>
+                        <circle cx="48" cy="96" r="3.5" fill="#facc15"/>
+                        <circle cx="48" cy="116" r="4" fill="#ef4444"/>
+                        <circle cx="48" cy="136" r="3.5" fill="#c084fc"/>
+
+                        <!-- Viajantes SW1 -> 4W -->
+                        <line x1="52" y1="96" x2="128" y2="96" stroke="#facc15" stroke-width="2.3"/>
+                        <line x1="52" y1="136" x2="128" y2="136" stroke="#c084fc" stroke-width="2.3"/>
+
+                        <!-- FOUR-WAY (4 bornes) -->
+                        <rect x="116" y="82" width="68" height="68" rx="5" fill="#1e293b" stroke="#38bdf8" stroke-width="1.8"/>
+                        <text x="150" y="76" fill="#38bdf8" font-size="9" text-anchor="middle" font-weight="bold">FOUR-WAY</text>
+                        <circle cx="132" cy="96" r="3.5" fill="#facc15"/>
+                        <circle cx="132" cy="136" r="3.5" fill="#c084fc"/>
+                        <circle cx="168" cy="96" r="3.5" fill="#facc15"/>
+                        <circle cx="168" cy="136" r="3.5" fill="#c084fc"/>
+                        <line x1="136" y1="98" x2="164" y2="134" stroke="#64748b" stroke-dasharray="3,2" stroke-width="1.2"/>
+                        <line x1="136" y1="134" x2="164" y2="98" stroke="#64748b" stroke-dasharray="3,2" stroke-width="1.2"/>
+
+                        <!-- Viajantes 4W -> SW2 -->
+                        <line x1="172" y1="96" x2="244" y2="96" stroke="#facc15" stroke-width="2.3"/>
+                        <line x1="172" y1="136" x2="244" y2="136" stroke="#c084fc" stroke-width="2.3"/>
+
+                        <!-- SW2 (3W) -->
+                        <rect x="224" y="82" width="48" height="68" rx="5" fill="#1e293b" stroke="#64748b" stroke-width="1.5"/>
+                        <text x="248" y="76" fill="#f8fafc" font-size="9" text-anchor="middle" font-weight="bold">3-WAY 2</text>
+                        <circle cx="248" cy="96" r="3.5" fill="#facc15"/>
+                        <circle cx="248" cy="116" r="4" fill="#f59e0b"/>
+                        <circle cx="248" cy="136" r="3.5" fill="#c084fc"/>
+
+                        <!-- Retorno lâmpada -->
+                        <polyline points="252,116 320,116 320,90" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+                        <line x1="320" y1="36" x2="320" y2="58" stroke="#38bdf8" stroke-width="2.5"/>
+
+                        <!-- Lâmpada -->
+                        <circle cx="320" cy="74" r="16" fill="#1e293b" stroke="#facc15" stroke-width="2"/>
+                        <line x1="310" y1="64" x2="330" y2="84" stroke="#facc15" stroke-width="1.6"/>
+                        <line x1="330" y1="64" x2="310" y2="84" stroke="#facc15" stroke-width="1.6"/>
+                        <text x="180" y="180" fill="#94a3b8" font-size="10" text-anchor="middle">Nas pontas sempre Three-Way; no meio quantos Four-Way quiser</text>
+                    </svg>
+                </div>
+
+                <ol class="steps">
+                    <li>Nas duas pontas do circuito sempre vão interruptores <b>Three-Way (3 bornes)</b>.</li>
+                    <li>Os 2 retornos que saem do primeiro Three-Way entram nos <b>2 bornes de ENTRADA</b> do Four-Way.</li>
+                    <li>Dos <b>2 bornes de SAÍDA</b> do Four-Way saem 2 retornos para os laterais do último Three-Way.</li>
+                    <li>Se precisar de 4 ou 5 pontos, basta intercalar mais módulos Four-Way no meio dos retornos.</li>
+                </ol>
+                <div class="tip-box">
+                    <b>Dica de campo:</b> Antes de apertar os parafusos, olhe o desenho gravado atrás do Four-Way. Algumas marcas usam entrada nos bornes do meio e saída nas pontas; outras usam lado esquerdo/direito.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ABA 2: VENTILADOR DE TETO -->
+    <div id="tab-vent" class="section">
+        <img src="banner-ventilador.png" class="topic-banner" alt="Ventilador de Teto" onerror="this.style.display='none'">
+
+        <div class="card">
+            <h2>Ventilador de Teto (Capacitor 2 Fios + Lâmpada)</h2>
+            <div class="svg-wrap">
+                <svg viewBox="0 0 360 220">
+                    <!-- Rede -->
+                    <line x1="15" y1="18" x2="345" y2="18" stroke="#ef4444" stroke-width="2.3"/>
+                    <line x1="15" y1="36" x2="310" y2="36" stroke="#38bdf8" stroke-width="2.3"/>
+                    <text x="16" y="13" fill="#ef4444" font-size="10" font-weight="bold">FASE</text>
+                    <text x="16" y="32" fill="#38bdf8" font-size="10" font-weight="bold">NEUTRO</text>
+
+                    <!-- Motor no teto -->
+                    <rect x="175" y="54" width="90" height="44" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="1.8"/>
+                    <text x="220" y="73" fill="#f8fafc" font-size="10" text-anchor="middle" font-weight="bold">MOTOR</text>
+                    <text x="220" y="88" fill="#94a3b8" font-size="9" text-anchor="middle">(3 fios no teto)</text>
+
+                    <!-- Neutro no comum do motor e na lâmpada -->
+                    <line x1="220" y1="36" x2="220" y2="54" stroke="#38bdf8" stroke-width="2.3"/>
+                    <line x1="310" y1="36" x2="310" y2="58" stroke="#38bdf8" stroke-width="2.3"/>
+
+                    <!-- Lâmpada -->
+                    <circle cx="310" cy="74" r="15" fill="#1e293b" stroke="#facc15" stroke-width="2"/>
+                    <text x="310" y="78" fill="#facc15" font-size="9" text-anchor="middle" font-weight="bold">LUZ</text>
+
+                    <!-- Capacitor 2 fios em paralelo com Vent/Exaust -->
+                    <rect x="190" y="114" width="60" height="22" rx="4" fill="#0f172a" stroke="#f59e0b" stroke-width="1.8"/>
+                    <text x="220" y="129" fill="#f59e0b" font-size="9" text-anchor="middle" font-weight="bold">CAPACITOR</text>
+
+                    <!-- Fios das bobinas (Vent e Exaust) -->
+                    <polyline points="195,98 195,125 190,125" fill="none" stroke="#facc15" stroke-width="2.2"/>
+                    <polyline points="245,98 245,125 250,125" fill="none" stroke="#c084fc" stroke-width="2.2"/>
+
+                    <!-- Caixinha Parede -->
+                    <rect x="18" y="128" width="96" height="74" rx="6" fill="#1e293b" stroke="#64748b" stroke-width="1.6"/>
+                    <text x="66" y="144" fill="#f8fafc" font-size="9.5" text-anchor="middle" font-weight="bold">CONTROLE PAREDE</text>
+                    <text x="66" y="160" fill="#facc15" font-size="8.5" text-anchor="middle">Ventilar / Exaustor</text>
+                    <text x="66" y="175" fill="#94a3b8" font-size="8.5" text-anchor="middle">+ Dimmer / Veloc.</text>
+                    <text x="66" y="191" fill="#f59e0b" font-size="8.5" text-anchor="middle">+ Tecla Lâmpada</text>
+
+                    <!-- Fase descendo para parede -->
+                    <polyline points="42,18 42,128" fill="none" stroke="#ef4444" stroke-width="2.3"/>
+
+                    <!-- Retornos subindo da parede -->
+                    <polyline points="114,155 195,155 195,125" fill="none" stroke="#facc15" stroke-width="2.2"/>
+                    <polyline points="114,172 245,172 245,125" fill="none" stroke="#c084fc" stroke-width="2.2"/>
+                    <polyline points="114,190 310,190 310,89" fill="none" stroke="#f59e0b" stroke-width="2.2"/>
+                    <text x="155" y="151" fill="#facc15" font-size="8.5" text-anchor="middle">Ret. Vent</text>
+                    <text x="155" y="168" fill="#c084fc" font-size="8.5" text-anchor="middle">Ret. Exaust</text>
+                    <text x="275" y="186" fill="#f59e0b" font-size="8.5" text-anchor="middle">Ret. Lâmpada</text>
+                </svg>
+            </div>
+
+            <ol class="steps">
+                <li>Ligue o <b>Neutro</b> da rede no fio <b>Comum do motor</b> (geralmente branco ou preto — confira o manual) e em um dos fios da lâmpada.</li>
+                <li>Ligue os <b>2 fios do capacitor</b> em paralelo nos outros 2 fios do motor (Ventilar e Exaustor).</li>
+                <li>Na caixinha da parede, leve a <b>Fase</b> para o comum da chave da lâmpada e para a entrada do controle do ventilador.</li>
+                <li>Suba <b>3 retornos</b> da caixinha até o teto: 1 para a lâmpada e 2 para cada ponta do capacitor (Ventilar / Exaustor).</li>
+            </ol>
+
+            <div class="tip-box">
+                <b>E se o capacitor for de 3 fios (controle de 3 velocidades)?</b><br>
+                O capacitor fica dentro da <b>caixinha da parede</b> (em série com a chave de velocidades), e os 2 retornos de Ventilar/Exaustor sobem direto para o motor. O fio comum do capacitor (geralmente preto/vermelho) liga na chave reversora e os outros 2 fios fazem as velocidades Mínima e Média.
+            </div>
+            <div class="warn-box">
+                <b>Ventilador girando fraco ou só zumbindo?</b> Em 90% dos casos é <b>capacitor seco/fraco</b> (perdeu capacitância em µF) ou ligação invertida do fio comum do motor.
+            </div>
+        </div>
+    </div>
+
+    <!-- ABA 3: BOIA ELÉTRICA -->
+    <div id="tab-boia" class="section">
+        <img src="banner-boia.png" class="topic-banner" alt="Boia Elétrica" onerror="this.style.display='none'">
+
+        <div class="card">
+            <h2>Boia Elétrica (Caixa Superior + Cisterna)</h2>
+            <div class="svg-wrap">
+                <svg viewBox="0 0 360 205">
+                    <!-- Rede -->
+                    <line x1="12" y1="20" x2="345" y2="20" stroke="#ef4444" stroke-width="2.5"/>
+                    <line x1="12" y1="38" x2="310" y2="38" stroke="#38bdf8" stroke-width="2.5"/>
+                    <text x="14" y="15" fill="#ef4444" font-size="10" font-weight="bold">FASE (Disjuntor)</text>
+                    <text x="14" y="34" fill="#38bdf8" font-size="10" font-weight="bold">NEUTRO</text>
+
+                    <!-- Fase descendo para Boia 1 -->
+                    <polyline points="55,20 55,90" fill="none" stroke="#ef4444" stroke-width="2.5"/>
+
+                    <!-- Boia Cisterna (NA) -->
+                    <rect x="20" y="90" width="98" height="62" rx="6" fill="#1e293b" stroke="#38bdf8" stroke-width="1.6"/>
+                    <text x="69" y="106" fill="#38bdf8" font-size="9.5" text-anchor="middle" font-weight="bold">BOIA CISTERNA</text>
+                    <text x="69" y="121" fill="#f8fafc" font-size="8.5" text-anchor="middle">Contato NA</text>
+                    <text x="69" y="135" fill="#94a3b8" font-size="8" text-anchor="middle">(Fecha c/ água)</text>
+                    <text x="69" y="146" fill="#facc15" font-size="8" text-anchor="middle">Opcional</text>
+
+                    <!-- Série entre boias -->
+                    <line x1="118" y1="120" x2="152" y2="120" stroke="#facc15" stroke-width="2.5"/>
+
+                    <!-- Boia Superior (NF) -->
+                    <rect x="152" y="90" width="102" height="62" rx="6" fill="#1e293b" stroke="#f59e0b" stroke-width="1.8"/>
+                    <text x="203" y="106" fill="#f59e0b" font-size="9.5" text-anchor="middle" font-weight="bold">CAIXA SUPERIOR</text>
+                    <text x="203" y="121" fill="#f8fafc" font-size="8.5" text-anchor="middle">Contato NF</text>
+                    <text x="203" y="135" fill="#94a3b8" font-size="8" text-anchor="middle">(Fecha quando seca)</text>
+
+                    <!-- Saída para Bomba -->
+                    <polyline points="254,120 310,120 310,104" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+                    <line x1="310" y1="38" x2="310" y2="66" stroke="#38bdf8" stroke-width="2.5"/>
+
+                    <!-- Bomba / Contator -->
+                    <circle cx="310" cy="85" r="20" fill="#1e293b" stroke="#10b981" stroke-width="2"/>
+                    <text x="310" y="83" fill="#10b981" font-size="9" text-anchor="middle" font-weight="bold">BOMBA</text>
+                    <text x="310" y="94" fill="#94a3b8" font-size="7.5" text-anchor="middle">ou A1/A2</text>
+
+                    <text x="180" y="182" fill="#94a3b8" font-size="9.5" text-anchor="middle">Ligação em SÉRIE: só liga se tiver água na cisterna E faltar na caixa</text>
+                </svg>
+            </div>
+
+            <ol class="steps">
+                <li><b>Teste com multímetro (continuidade) antes de subir no telhado:</b> identifique o fio Comum (normalmente Preto).</li>
+                <li><b>Para ENCHER (Caixa Superior):</b> use o par de fios que <b>apita com a boia caída para baixo</b> (contato NF). Isole muito bem o 3º fio que sobrar.</li>
+                <li><b>Para PROTEGER BOMBA (Cisterna):</b> use o par que <b>apita com a boia levantada</b> (contato NA). Se a cisterna secar, ela corta a fase e salva a bomba.</li>
+                <li>Se usar apenas 1 boia (só caixa superior), leve a Fase direto no Comum dela e a saída para a bomba.</li>
+            </ol>
+
+            <div class="warn-box">
+                <b>Regra de ouro em campo:</b> Para bombas acima de <b>1/2 CV</b> (ou qualquer bomba 220V bifásica/trifásica), <b>NUNCA</b> passe a corrente da bomba direto pela boia — use a boia apenas para acionar a bobina (A1) de um <b>contator</b> com relé térmico!
+            </div>
+        </div>
+    </div>
+
+    <!-- ABA 4: FOTOCÉLULA E SENSOR -->
+    <div id="tab-sensor" class="section">
+        <img src="banner-sensor.png" class="topic-banner" alt="Fotocélula e Sensor" onerror="this.style.display='none'">
+
+        <div class="card">
+            <h2>Fotocélula 3 Fios &amp; Sensor de Presença</h2>
+            <div class="svg-wrap">
+                <svg viewBox="0 0 360 195">
+                    <!-- Rede -->
+                    <line x1="15" y1="20" x2="345" y2="20" stroke="#ef4444" stroke-width="2.5"/>
+                    <line x1="15" y1="40" x2="310" y2="40" stroke="#38bdf8" stroke-width="2.5"/>
+                    <text x="16" y="15" fill="#ef4444" font-size="10" font-weight="bold">FASE (L)</text>
+                    <text x="16" y="35" fill="#38bdf8" font-size="10" font-weight="bold">NEUTRO (N)</text>
+
+                    <!-- Módulo Fotocélula / Sensor -->
+                    <rect x="65" y="82" width="130" height="72" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="1.8"/>
+                    <text x="130" y="102" fill="#f59e0b" font-size="10" text-anchor="middle" font-weight="bold">FOTOCÉLULA / SENSOR</text>
+                    <text x="130" y="118" fill="#f8fafc" font-size="9" text-anchor="middle">Preto = Fase (L)</text>
+                    <text x="130" y="131" fill="#38bdf8" font-size="9" text-anchor="middle">Branco/Azul = Neutro</text>
+                    <text x="130" y="144" fill="#facc15" font-size="9" text-anchor="middle">Vermelho = Carga (Ret.)</text>
+
+                    <!-- Ligações -->
+                    <polyline points="90,20 90,82" fill="none" stroke="#ef4444" stroke-width="2.5"/>
+                    <polyline points="130,40 130,82" fill="none" stroke="#38bdf8" stroke-width="2.5"/>
+                    <polyline points="195,120 300,120 300,100" fill="none" stroke="#facc15" stroke-width="2.5"/>
+                    <line x1="300" y1="40" x2="300" y2="66" stroke="#38bdf8" stroke-width="2.5"/>
+
+                    <!-- Lâmpada / Refletor -->
+                    <circle cx="300" cy="83" r="17" fill="#1e293b" stroke="#facc15" stroke-width="2"/>
+                    <text x="300" y="87" fill="#facc15" font-size="8.5" text-anchor="middle" font-weight="bold">CARGA</text>
+
+                    <text x="180" y="180" fill="#94a3b8" font-size="9.5" text-anchor="middle">Padrão 3 fios (NBR 5123) — sempre confira a etiqueta do fabricante</text>
+                </svg>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fio (Padrão 3 fios)</th>
+                        <th>Onde Ligar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><b>Preto</b> (ou Marrom)</td>
+                        <td>Fase da rede (saída do disjuntor)</td>
+                    </tr>
+                    <tr>
+                        <td><b>Branco</b> (ou Azul)</td>
+                        <td>Neutro da rede <b>+</b> um polo da lâmpada</td>
+                    </tr>
+                    <tr>
+                        <td><b>Vermelho</b> (ou Amarelo)</td>
+                        <td>Retorno direto no outro polo da lâmpada</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="tip-box">
+                <b>E na Fotocélula de 4 fios?</b> Dois fios são entrada de alimentação (Fase + Neutro) e os outros dois vão direto para a lâmpada/refletor.<br>
+                <b>Dica para não piscar:</b> Nunca aponte a fotocélula para a própria lâmpada que ela acende, senão ela entra em ciclo infinito (acende → vê luz → apaga → escurece → acende).
+            </div>
+        </div>
+    </div>
+
+    <!-- ABA 5: QDC / DR / DPS -->
+    <div id="tab-qdc" class="section">
+        <img src="banner-qdc.png" class="topic-banner" alt="QDC DR e DPS" onerror="this.style.display='none'">
+
+        <div class="card">
+            <h2>Sequência Correta no QDC (Geral → DPS → DR)</h2>
+            <div class="svg-wrap">
+                <svg viewBox="0 0 360 215">
+                    <!-- Entrada -->
+                    <text x="10" y="18" fill="#ef4444" font-size="9.5" font-weight="bold">FASE ENT.</text>
+                    <text x="10" y="34" fill="#38bdf8" font-size="9.5" font-weight="bold">NEUTRO ENT.</text>
+
+                    <!-- DJ Geral -->
+                    <rect x="20" y="54" width="60" height="58" rx="5" fill="#1e293b" stroke="#ef4444" stroke-width="1.8"/>
+                    <text x="50" y="76" fill="#f8fafc" font-size="9.5" text-anchor="middle" font-weight="bold">DJ GERAL</text>
+                    <text x="50" y="92" fill="#94a3b8" font-size="8" text-anchor="middle">Entrada</text>
+
+                    <!-- DPS -->
+                    <rect x="102" y="54" width="54" height="58" rx="5" fill="#1e293b" stroke="#f59e0b" stroke-width="1.8"/>
+                    <text x="129" y="78" fill="#f59e0b" font-size="10" text-anchor="middle" font-weight="bold">DPS</text>
+                    
