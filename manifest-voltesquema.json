@@ -1,0 +1,21 @@
+{
+  "id": "./voltesquema.html",
+  "name": "VoltEsquema - Ligações Elétricas",
+  "short_name": "VoltEsquema",
+  "description": "Esquemas de ligação elétrica: Three-Way, Four-Way, Ventilador, Boia, Fotocélula e QDC com DR/DPS 100% offline.",
+  "start_url": "./voltesquema.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#1e3a8a",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "icone-voltesquema.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
