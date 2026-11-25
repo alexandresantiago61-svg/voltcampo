@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1e3a8a">
+<title>VoltSPDA - Inspeção SPDA (NBR 5419)</title>
+<link rel="manifest" href="manifest-voltspda.json">
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--bd:#334155;--pri:#2563eb;--acc:#f59e0b;--cyn:#38bdf8;--ok:#10b981;--err:#ef4444;--txt:#f8fafc;--mut:#94a3b8}
+*{box-sizing:border-box;font-family:'Segoe UI',Roboto,Arial,sans-serif}
+body{margin:0;background:var(--bg);color:var(--txt);padding-bottom:40px}
+header{background:linear-gradient(135deg,#1e3a8a,#0f172a);padding:14px 16px;border-bottom:2px solid var(--acc);position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center}
+header h1{margin:0;font-size:19px;color:var(--acc)}
+header small{color:var(--mut);font-size:11.5px;display:block}
+.badge{font-size:11px;padding:4px 8px;border-radius:20px;background:rgba(16,185,129,.15);color:var(--ok);border:1px solid rgba(16,185,129,.4);font-weight:700}
+.tabs{display:flex;background:var(--card);border-bottom:1px solid var(--bd)}
+.tab-btn{flex:1;padding:12px 6px;background:none;border:none;color:var(--mut);font-weight:700;font-size:12.5px;cursor:pointer;border-bottom:3px solid transparent}
+.tab-btn.active{color:var(--acc);border-bottom-color:var(--acc);background:rgba(245,158,11,.08)}
+.wrap{max-width:740px;margin:0 auto;padding:14px}
+.sec{display:none}.sec.active{display:block}
+.banner{width:100%;max-height:150px;object-fit:cover;border-radius:10px;border:1px solid var(--bd);margin-bottom:12px;display:block}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:14px;margin-bottom:14px}
+.card h2{margin:0 0 10px;font-size:13.5px;color:var(--acc);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--bd);padding-bottom:6px}
+.row{display:flex;gap:10px;flex-wrap:wrap}.col{flex:1;min-width:130px}
+label{display:block;font-size:11.5px;color:var(--mut);margin-bottom:4px;font-weight:600}
+input,select,textarea{width:100%;padding:9px;border-radius:6px;border:1px solid var(--bd);background:#0f172a;color:var(--txt);font-size:14px;margin-bottom:9px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--acc)}
+.kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.kpi div{background:#0f172a;border:1px solid var(--bd);border-radius:8px;padding:8px;text-align:center}
+.kpi b{display:block;font-size:18px;margin-top:2px}.kpi small{font-size:10.5px;color:var(--mut);text-transform:uppercase}
+.chk-item{background:#0f172a;border:1px solid var(--bd);border-radius:8px;padding:10px;margin-bottom:8px}
+.chk-top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.chk-txt{font-size:13px;font-weight:600;flex:1;min-width:180px}
+.st-grp{display:flex;gap:5px}
+.st-btn{padding:6px 10px;border-radius:6px;border:1px solid var(--bd);background:#1e293b;color:var(--mut);font-size:11.5px;font-weight:700;cursor:pointer}
+.st-btn.ok.on{background:var(--ok);color:#fff;border-color:var(--ok)}
+.st-btn.nc.on{background:var(--err);color:#fff;border-color:var(--err)}
+.st-btn.na.on{background:#64748b;color:#fff;border-color:#64748b}
+.chk-obs{margin-top:7px;margin-bottom:0;font-size:12.5px;padding:7px}
+table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px}
+th,td{padding:7px 5px;border-bottom:1px solid var(--bd);text-align:left}
+th{color:var(--acc);background:#0f172a;font-size:11.5px}
+.pill{padding:2px 7px;border-radius:12px;font-size:11px;font-weight:700}
+.p-ok{background:rgba(16,185,129,.2);color:#6ee7b7}.p-nc{background:rgba(239,68,68,.2);color:#fca5a5}
+.photos{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+.ph-card{background:#0f172a;border:1px solid var(--bd);border-radius:8px;padding:6px;position:relative}
+.ph-card img{width:100%;height:120px;object-fit:cover;border-radius:5px;display:block}
+.ph-card input{margin:6px 0 0;font-size:12px;padding:6px}
+.ph-del{position:absolute;top:10px;right:10px;background:rgba(239,68,68,.9);color:#fff;border:none;border-radius:50%;width:24px;height:24px;font-weight:700;cursor:pointer}
+canvas{width:100%;height:130px;background:#fff;border-radius:8px;border:2px dashed var(--bd);touch-action:none;display:block}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 14px;border-radius:8px;border:none;font-weight:700;font-size:13.5px;cursor:pointer;color:#fff;width:100%;margin-top:8px}
+.b-pri{background:var(--pri)}.b-ok{background:var(--ok)}.b-acc{background:#d97706}.b-err{background:var(--err)}.b-out{background:transparent;border:1px solid var(--bd);color:var(--txt)}
+.btn-sm{padding:5px 9px;font-size:12px;width:auto;margin:0}
+.note{padding:9px;border-radius:8px;font-size:12px;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.35);color:#e0f2fe;line-height:1.45;margin-top:6px}
+#print-report{display:none}
+@media print{
+  body{background:#fff;color:#111;padding:0}
+  header,.tabs,.wrap{display:none!important}
+  #print-report{display:block!important;padding:16px;font-size:12px;color:#111}
+  #print-report h1{margin:0;font-size:18px;color:#1e3a8a;border-bottom:2px solid #1e3a8a;padding-bottom:6px}
+  #print-report h3{margin:14px 0 6px;font-size:13px;background:#e2e8f0;padding:5px 8px;color:#0f172a}
+  #print-report table{width:100%;border-collapse:collapse;margin-bottom:8px}
+  #print-report th,#print-report td{border:1px solid #cbd5e1;padding:5px 6px;color:#111;background:#fff}
+  #print-report th{background:#f1f5f9;font-weight:700}
+  .pr-photos{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+  .pr-ph{border:1px solid #cbd5e1;padding:6px;page-break-inside:avoid;text-align:center}
+  .pr-ph img{max-width:100%;max-height:170px;object-fit:contain}
+  .pr-sig{margin-top:18px;text-align:center;page-break-inside:avoid}
+  .pr-sig img{max-height:75px;border-bottom:1px solid #111;padding-bottom:4px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div><h1>⚡ VoltSPDA</h1><small>Levantamento e Inspeção — ABNT NBR 5419</small></div>
+  <span class="badge">OFFLINE</span>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="openTab('tab-dados',this)">1. Dados</button>
+  <button class="tab-btn" onclick="openTab('tab-check',this)">2. Checklist</button>
+  <button class="tab-btn" onclick="openTab('tab-med',this)">3. Medições/PDF</button>
+</div>
+
+<div class="wrap">
+  <!-- ABA 1: DADOS -->
+  <div id="tab-dados" class="sec active">
+    <img src="banner-spda-dados.png" class="banner" alt="SPDA NBR 5419" onerror="this.style.display='none'">
+    <div class="card">
+      <h2>Identificação da Edificação</h2>
+      <label>Cliente / Condomínio / Empresa</label>
+      <input id="d-cli" placeholder="Ex: Condomínio Residencial Solar" oninput="save()">
+      <label>Endereço da Vistoria</label>
+      <input id="d-end" placeholder="Rua, nº, bairro, cidade" oninput="save()">
+      <div class="row">
+        <div class="col"><label>Data da Inspeção</label><input type="date" id="d-data" onchange="save()"></div>
+        <div class="col">
+          <label>Tipo de Inspeção</label>
+          <select id="d-tipo" onchange="save()">
+            <option>Periódica Anual</option>
+            <option>Visual Semestral</option>
+            <option>Levantamento p/ Orçamento</option>
+            <option>Pós-Descarga Atmosférica</option>
+            <option>Comissionamento / Obra Nova</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Características do SPDA</h2>
+      <div class="row">
+        <div class="col">
+          <label>Nível de Proteção (NP)</label>
+          <select id="d-np" onchange="save()">
+            <option>Classe I (Risco Crítico)</option>
+            <option>Classe II (Industrial/Hospital)</option>
+            <option selected>Classe III (Comercial/Residencial)</option>
+            <option>Classe IV (Baixo Risco)</option>
+          </select>
+        </div>
+        <div class="col">
+          <label>Método de Captação</label>
+          <select id="d-met" onchange="save()">
+            <option>Gaiola de Faraday (Malha)</option>
+            <option>Franklin (Mastro)</option>
+            <option>Misto (Franklin + Faraday)</option>
+            <option>Estrutural (Armadura)</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col"><label>Responsável Técnico</label><input id="d-rt" placeholder="Seu nome / Empresa" oninput="save()"></div>
+        <div class="col"><label>Registro (CRT / CREA)</label><input id="d-reg" placeholder="Ex: CRT-RJ / CREA-RJ" oninput="save()"></div>
+      </div>
+      <label>Parecer Técnico Preliminar</label>
+      <select id="d-par" onchange="save()">
+        <option value="CONFORME">✅ APROVADO — Sistema Conforme NBR 5419</option>
+        <option value="COM RESSALVAS">⚠️ APROVADO COM RESSALVAS — Requer Adequação</option>
+        <option value="NÃO CONFORME">❌ REPROVADO — Não Conforme (Pendências Críticas)</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- ABA 2: CHECKLIST -->
+  <div id="tab-check" class="sec">
+    <img src="banner-spda-check.png" class="banner" alt="Checklist SPDA" onerror="this.style.display='none'">
+    <div class="kpi">
+      <div><small>Conformes</small><b id="k-ok" style="color:var(--ok)">0</b></div>
+      <div><small>Pendências (N/C)</small><b id="k-nc" style="color:var(--err)">0</b></div>
+      <div><small>Não Aplica</small><b id="k-na" style="color:var(--mut)">0</b></div>
+    </div>
+    <div id="check-list"></div>
+  </div>
+
+  <!-- ABA 3: MEDIÇÕES, FOTOS E PDF -->
+  <div id="tab-med" class="sec">
+    <img src="banner-spda-medicao.png" class="banner" alt="Medições SPDA" onerror="this.style.display='none'">
+    <div class="card">
+      <h2>Instrumento de Medição</h2>
+      <div class="row">
+        <div class="col"><label>Equipamento (Terrômetro / Miliohmímetro)</label><input id="m-eq" placeholder="Ex: Minipa MTR-1522 / Instrutherm" oninput="save()"></div>
+        <div class="col"><label>Nº Série / Certificado Calibração</label><input id="m-cal" placeholder="Ex: CAL-2026-041" oninput="save()"></div>
+      </div>
+      <div class="note">
+        <b>Referência NBR 5419:</b> Continuidade elétrica das descidas/armaduras deve ser <b>&le; 0,2 &Omega;</b>. Para aterramento, a norma avalia a geometria e integridade da malha (<b>&le; 10 &Omega;</b> segue como referência prática de campo).
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Registrar Medição em Campo</h2>
+      <div class="row">
+        <div class="col"><label>Ponto / Tag</label><input id="in-ponto" placeholder="Ex: Descida D1 / Caixa CI-01"></div>
+        <div class="col">
+          <label>Ensaio</label>
+          <select id="in-ensaio">
+            <option value="cont">Continuidade (&Omega;)</option>
+            <option value="ater">Aterramento (&Omega;)</option>
+          </select>
+        </div>
+        <div class="col"><label>Valor (&Omega;)</label><input type="number" id="in-val" step="0.01" placeholder="Ex: 0.08"></div>
+      </div>
+      <button class="btn b-pri" onclick="addMed()">+ Adicionar Medição</button>
+      <table>
+        <thead><tr><th>Ponto</th><th>Ensaio</th><th>Valor</th><th>Status</th><th></th></tr></thead>
+        <tbody id="med-body"></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Evidências Fotográficas (Anomalias / Pontos)</h2>
+      <input type="file" id="ph-in" accept="image/*" capture="environment" onchange="addPhoto(this)">
+      <div id="ph-grid" class="photos"></div>
+    </div>
+
+    <div class="card">
+      <h2>Observações &amp; Recomendações p/ Orçamento</h2>
+      <textarea id="d-obs" rows="3" placeholder="Descreva materiais ou adequações necessárias (ex: substituir 3 conectores mini-gar, repor tampa de caixa de inspeção, instalar DPS Classe I no QGBT)..." oninput="save()"></textarea>
+      <label>Assinatura do Responsável Técnico</label>
+      <canvas id="sig"></canvas>
+      <button class="btn b-out" onclick="clearSig()">Limpar Assinatura</button>
+      <button class="btn b-acc" onclick="printPDF()">📄 Gerar Relatório PDF (A4)</button>
+      <button class="btn b-ok" onclick="shareWA()">💬 Enviar Resumo no WhatsApp</button>
+      <button class="btn b-err" onclick="resetAll()">🗑️ Nova Inspeção (Limpar Tudo)</button>
+    </div>
+  </div>
+</div>
+
+<!-- ÁREA EXCLUSIVA DE IMPRESSÃO PDF A4 -->
+<div id="print-report"></div>
+
+<script>
+const ITEMS = [
+  {cat:'1. Subsistema de Captação', id:'c1', txt:'Mastros, captores Franklin e suportes firmes e sem corrosão'},
+  {cat:'1. Subsistema de Captação', id:'c2', txt:'Malha/anéis de cobertura contínuos, sem rompimentos ou emendas soltas'},
+  {cat:'1. Subsistema de Captação', id:'c3', txt:'Volumes metálicos no topo (antenas, exaustores, reservatórios) protegidos/equipotencializados'},
+  {cat:'1. Subsistema de Captação', id:'c4', txt:'Conexões e abraçadeiras bimetálicas íntegras (sem oxidação galvânica)'},
+  {cat:'2. Subsistema de Descidas', id:'d1', txt:'Condutores de descida íntegros, bem esticados e fixados com isoladores/presilhas'},
+  {cat:'2. Subsistema de Descidas', id:'d2', txt:'Proteção mecânica (eletroduto PVC rígido) nos 2,5 m inferiores das descidas externas'},
+  {cat:'2. Subsistema de Descidas', id:'d3', txt:'Espaçamento e quantidade de descidas compatíveis com a classe do SPDA'},
+  {cat:'2. Subsistema de Descidas', id:'d4', txt:'Integridade dos conectores de medição / rebaixamento (sem zinabre ou folga)'},
+  {cat:'3. Aterramento e Caixas de Inspeção', id:'a1', txt:'Caixas de inspeção localizadas, desobstruídas e com tampas íntegras'},
+  {cat:'3. Aterramento e Caixas de Inspeção', id:'a2', txt:'Conexões haste/cabo (solda exotérmica ou conector de pressão) sem oxidação severa'},
+  {cat:'3. Aterramento e Caixas de Inspeção', id:'a3', txt:'Continuidade elétrica confirmada entre descidas e malha de aterramento'},
+  {cat:'4. Equipotencialização (BEP) e DPS', id:'e1', txt:'Barramento de Equipotencialização Principal (BEP) acessível e identificado'},
+  {cat:'4. Equipotencialização (BEP) e DPS', id:'e2', txt:'Tubulações metálicas, eletrocalhas e massas ligadas ao BEP'},
+  {cat:'4. Equipotencialização (BEP) e DPS', id:'e3', txt:'DPS instalado no QGBT/Entrada (Classe I ou I+II) com bandeiras de status OK (verde)'},
+  {cat:'4. Equipotencialização (BEP) e DPS', id:'e4', txt:'Documentação prévia / Projeto "As Built" e histórico de inspeções disponíveis'}
+];
+
+let state = { checks:{}, meds:[], photos:[], fields:{} };
+
+function openTab(id, btn){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='tab-med') resizeSig();
+}
+
+function renderCheck(){
+  const box = document.getElementById('check-list');
+  let html='', lastCat='';
+  ITEMS.forEach(it=>{
+    if(it.cat!==lastCat){
+      if(lastCat) html+='</div>';
+      html+=`<div class="card"><h2>${it.cat}</h2>`;
+      lastCat=it.cat;
+    }
+    const st = (state.checks[it.id]&&state.checks[it.id].st)||'';
+    const obs = (state.checks[it.id]&&state.checks[it.id].obs)||'';
+    html+=`<div class="chk-item">
+      <div class="chk-top">
+        <span class="chk-txt">${it.txt}</span>
+        <div class="st-grp">
+          <button class="st-btn ok ${st==='OK'?'on':''}" onclick="setSt('${it.id}','OK')">OK</button>
+          <button class="st-btn nc ${st==='NC'?'on':''}" onclick="setSt('${it.id}','NC')">N/C</button>
+          <button class="st-btn na ${st==='NA'?'on':''}" onclick="setSt('${it.id}','NA')">N/A</button>
+        </div>
+      </div>
+      <input class="chk-obs" placeholder="Observação / local da pendência..." value="${obs.replace(/"/g,'&quot;')}" oninput="setObs('${it.id}',this.value)">
+    </div>`;
+  });
+  html+='</div>';
+  box.innerHTML=html;
+  updateKPI();
+}
+
+function setSt(id, val){
+  if(!state.checks[id]) state.checks[id]={st:'',obs:''};
+  state.checks[id].st = state.checks[id].st===val ? '' : val;
+  save(); renderCheck();
+}
+function setObs(id, val){
+  if(!state.checks[id]) state.checks[id]={st:'',obs:''};
+  state.checks[id].obs = val; save();
+}
+function updateKPI(){
+  let ok=0,nc=0,na=0;
+  ITEMS.forEach(it=>{
+    const s=(state.checks[it.id]||{}).st;
+    if(s==='OK') ok++; else if(s==='NC') nc++; else if(s==='NA') na++;
+  });
+  document.getElementById('k-ok').innerText=ok;
+  document.getElementById('k-nc').innerText=nc;
+  document.getElementById('k-na').innerText=na;
+}
+
+function addMed(){
+  const p = document.getElementById('in-ponto').value.trim();
+  const e = document.getElementById('in-ensaio').value;
+  const v = parseFloat(document.getElementById('in-val').value);
+  if(!p || isNaN(v)) return alert('Preencha o ponto e o valor medido em Ohms.');
+  const ok = e==='cont' ? v<=0.2 : v<=10;
+  state.meds.push({p, e: e==='cont'?'Continuidade':'Aterramento', v: v.toFixed(2), ok});
+  document.getElementById('in-ponto').value='';
+  document.getElementById('in-val').value='';
+  save(); renderMeds();
+}
+function delMed(i){ state.meds.splice(i,1); save(); renderMeds(); }
+function renderMeds(){
+  const tb = document.getElementById('med-body');
+  if(!state.meds.length){ tb.innerHTML='<tr><td colspan="5" style="color:var(--mut);text-align:center">Nenhuma medição registrada</td></tr>'; return; }
+  tb.innerHTML = state.meds.map((m,i)=>`<tr>
+    <td><b>${m.p}</b></td><td>${m.e}</td><td>${m.v} &Omega;</td>
+    <td><span class="pill ${m.ok?'p-ok':'p-nc'}">${m.ok?'OK':'Atenção'}</span></td>
+    <td><button class="btn b-err btn-sm" onclick="delMed(${i})">✕</button></td>
+  </tr>`).join('');
+}
+
+function addPhoto(input){
+  const f = input.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement('canvas');
+      const max = 720; let w=img.width, h=img.height;
+      if(w>max){ h=h*(max/w); w=max; }
+      c.width=w; c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      state.photos.push({src:c.toDataURL('image/jpeg',0.72), cap:''});
+      save(); renderPhotos();
+    };
+    img.src = e.target.result;
+  };
+  r.readAsDataURL(f);
+  input.value='';
+}
+function delPhoto(i){ state.photos.splice(i,1); save(); renderPhotos(); }
+function setCap(i,v){ state.photos[i].cap=v; save(); }
+function renderPhotos(){
+  document.getElementById('ph-grid').innerHTML = state.photos.map((p,i)=>`<div class="ph-card">
+    <button class="ph-del" onclick="delPhoto(${i})">✕</button>
+    <img src="${p.src}">
+    <input placeholder="Legenda da foto..." value="${(p.cap\vert{}\vert{}'').replace(/"/g,'&quot;')}" oninput="setCap(${i},this.value)">
+  </div>`).join('');
+}
+
+// ASSINATURA
+const sig = document.getElementById('sig');
+const ctx = sig.getContext('2d');
+let drawing=false, hasSig=false;
+function resizeSig(){
+  const rect = sig.getBoundingClientRect();
+  if(!rect.width) return;
+  const imgData = hasSig ? sig.toDataURL() : null;
+  sig.width = rect.width; sig.height = 130;
+  ctx.lineWidth=2.2; ctx.lineCap='round'; ctx.strokeStyle='#0f172a';
+  if(imgData){ const im=new Image(); im.onload=()=>ctx.drawImage(im,0,0); im.src=imgData; }
+}
+function getPos(e){
+  const r=sig.getBoundingClientRect();
+  const t=e.touches?e.touches[0]:e;
+  return {x:t.clientX-r.left, y:t.clientY-r.top};
+}
+['mousedown','touchstart'].forEach(ev=>sig.addEventListener(ev,e=>{
+  if(e.touches) e.preventDefault();
+  drawing=true; hasSig=true; const p=getPos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y);
+},{passive:false}));
+['mousemove','touchmove'].forEach(ev=>sig.addEventListener(ev,e=>{
+  if(!drawing) return; if(e.touches) e.preventDefault();
+  const p=getPos(e); ctx.lineTo(p.x,p.y); ctx.stroke();
+},{passive:false}));
+['mouseup','touchend','mouseleave'].forEach(ev=>sig.addEventListener(ev,()=>drawing=false));
+function clearSig(){ ctx.clearRect(0,0,sig.width,sig.height); hasSig=false; }
+
+// SALVAR / CARREGAR
+const FIDS = ['d-cli','d-end','d-data','d-tipo','d-np','d-met','d-rt','d-reg','d-par','m-eq','m-cal','d-obs'];
+function save(){
+  FIDS.forEach(id=>state.fields[id]=document.getElementById(id).value);
+  try{ localStorage.setItem('voltspda_v1', JSON.stringify(state)); }catch(e){}
+}
+function load(){
+  try{
+    const s = JSON.parse(localStorage.getItem('voltspda_v1'));
+    if(s) state = Object.assign(state, s);
+  }catch(e){}
+  FIDS.forEach(id=>{ if(state.fields[id]!==undefined) document.getElementById(id).value=state.fields[id]; });
+  if(!document.getElementById('d-data').value) document.getElementById('d-data').value = new Date().toISOString().slice(0,10);
+  renderCheck(); renderMeds(); renderPhotos();
+}
+
+// PDF A4
+function printPDF(){
+  const g = id => document.getElementById(id).value || '-';
+  const chkRows = ITEMS.map(it=>{
+    const c = state.checks[it.id]||{st:'-',obs:''};
+    return `<tr><td>${it.txt}</td><td style="text-align:center;font-weight:700">${c.st\vert{}\vert{}'-'}</td><td>${c.obs||''}</td></tr>`;
+  }).join('');
+  const medRows = state.meds.length ? state.meds.map(m=>`<tr><td>${m.p}</td><td>${m.e}</td><td>${m.v} &Omega;</td><td>${m.ok?'Conforme':'Atenção'}</td></tr>`).join('')
+    : '<tr><td colspan="4">Sem medições instrumentais registradas.</td></tr>';
+  const phHtml = state.photos.length ? `<h3>4. Registro Fotográfico</h3><div class="pr-photos">${state.photos.map(p=>`<div class="pr-ph"><img src="${p.src}"><div>${p.cap||''}</div></div>`).join('')}</div>` : '';
+  const sigHtml = hasSig ? `<img src="${sig.toDataURL()}"><br>` : '<div style="height:55px;border-bottom:1px solid #111;width:260px;margin:0 auto 6px"></div>';
+
+  document.getElementById('print-report').innerHTML = `
+    <h1>RELATÓRIO TÉCNICO DE INSPEÇÃO DE SPDA (ABNT NBR 5419)</h1>
+    <table>
+      <tr><td><b>Cliente / Edificação:</b> ${g('d-cli')}</td><td><b>Data:</b>${g('d-data')}</td></tr>
+      <tr><td colspan="2"><b>Endereço:</b> ${g('d-end')}</td></tr>
+      <tr><td><b>Tipo de Inspeção:</b> ${g('d-tipo')}</td><td><b>Nível / Método:</b> ${g('d-np')} —${g('d-met')}</td></tr>
+      <tr><td><b>Resp. Técnico:</b> ${g('d-rt')} (${g('d-reg')})</td><td><b>Parecer:</b> <b>${g('d-par')}</b></td></tr>
+    </table>
+    <h3>1. Checklist de Inspeção Visual</h3>
+    <table><thead><tr><th>Item Verificado</th><th style="width:6
