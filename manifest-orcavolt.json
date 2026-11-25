@@ -10,14 +10,11 @@
   "background_color": "#0f172a",
   "theme_color": "#1e3a8a",
   "lang": "pt-BR",
-    "icons": [
+  "icons": [
     {
       "src": "icone-orcavolt.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
-    }
-  ]
       "purpose": "any"
     }
   ]
