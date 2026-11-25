@@ -1,0 +1,21 @@
+{
+  "id": "./orcavolt.html",
+  "name": "OrçaVolt - Orçamentos e Recibos",
+  "short_name": "OrçaVolt",
+  "description": "Gerador de orçamentos e recibos elétricos em PDF e WhatsApp.",
+  "start_url": "./orcavolt.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#1e3a8a",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "%C3%ADcone-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
