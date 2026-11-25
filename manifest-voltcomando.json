@@ -1,0 +1,21 @@
+{
+  "id": "./voltcomando.html",
+  "name": "VoltComando - Comandos Elétricos",
+  "short_name": "VoltComando",
+  "description": "Dimensionamento rápido de Partida Direta, Estrela-Triângulo e Inversor/Soft-Starter 100% offline.",
+  "start_url": "./voltcomando.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#1e3a8a",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "icone-voltcomando.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
