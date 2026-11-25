@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1e3a8a">
+    <title>VoltComando - Comandos Elétricos</title>
+    <link rel="manifest" href="manifest-voltcomando.json">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --border: #334155;
+            --primary: #2563eb;
+            --accent: #f59e0b;
+            --cyan: #38bdf8;
+            --success: #10b981;
+            --danger: #ef4444;
+            --text: #f8fafc;
+            --muted: #94a3b8;
+        }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, Arial, sans-serif; }
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            padding-bottom: 40px;
+        }
+        header {
+            background: linear-gradient(135deg, #1e3a8a, #0f172a);
+            padding: 16px;
+            border-bottom: 2px solid var(--accent);
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 20px;
+            color: var(--accent);
+            letter-spacing: 0.5px;
+        }
+        header small { color: var(--muted); font-size: 12px; display: block; }
+        .badge-offline {
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 20px;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            font-weight: bold;
+        }
+        .tabs {
+            display: flex;
+            background: #1e293b;
+            border-bottom: 1px solid var(--border);
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 12px 6px;
+            background: none;
+            border: none;
+            color: var(--muted);
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+        .tab-btn.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+            background: rgba(245, 158, 11, 0.08);
+        }
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 14px;
+        }
+        .section { display: none; }
+        .section.active { display: block; }
+        .topic-banner {
+            width: 100%;
+            max-height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            margin-bottom: 14px;
+            display: block;
+        }
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 14px;
+        }
+        .card h2 {
+            margin: 0 0 12px 0;
+            font-size: 14px;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 6px;
+        }
+        .row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .col { flex: 1; min-width: 110px; }
+        label {
+            display: block;
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: #0f172a;
+            color: var(--text);
+            font-size: 15px;
+            margin-bottom: 10px;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 6px;
+        }
+        .res-box {
+            background: #0f172a;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+        .res-box.highlight {
+            border-color: var(--accent);
+            background: rgba(245, 158, 11, 0.08);
+        }
+        .res-label {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+        }
+        .res-val {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--cyan);
+            margin-top: 4px;
+        }
+        .res-box.highlight .res-val { color: var(--accent); }
+        .note-box {
+            margin-top: 12px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            line-height: 1.45;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            color: #e0f2fe;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 11px 14px;
+            border-radius: 8px;
+            border: none;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            color: #fff;
+            width: 100%;
+            margin-top: 12px;
+        }
+        .btn-success { background: var(--success); }
+    </style>
+</head>
+<body>
+
+<header>
+    <div>
+        <h1>⚙️ VoltComando</h1>
+        <small>Dimensionamento de Comandos Elétricos</small>
+    </div>
+    <span class="badge-offline">OFFLINE</span>
+</header>
+
+<div class="tabs">
+    <button class="tab-btn active" onclick="openTab('tab-direta', this)">Partida Direta</button>
+    <button class="tab-btn" onclick="openTab('tab-estrela', this)">Estrela-Triângulo</button>
+    <button class="tab-btn" onclick="openTab('tab-inv', this)">Inversor / Soft</button>
+</div>
+
+<div class="container">
+
+    <!-- DADOS COMUNS DO MOTOR -->
+    <div class="card">
+        <h2>Dados do Motor Trifásico</h2>
+        <div class="row">
+            <div class="col">
+                <label>Potência</label>
+                <input type="number" id="mot-pot" value="5" step="0.5" min="0.25" oninput="recalcAll()">
+            </div>
+            <div class="col">
+                <label>Unidade</label>
+                <select id="mot-unit" onchange="recalcAll()">
+                    <option value="cv" selected>CV (Cavalo)</option>
+                    <option value="kw">kW</option>
+                </select>
+            </div>
+            <div class="col">
+                <label>Tensão (V)</label>
+                <select id="mot-volt" onchange="recalcAll()">
+                    <option value="220" selected>220 V (3Ø)</option>
+                    <option value="380">380 V (3Ø)</option>
+                    <option value="440">440 V (3Ø)</option>
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label>Fator de Potência (cos φ)</label>
+                <input type="number" id="mot-fp" value="0.85" step="0.01" min="0.5" max="1" oninput="recalcAll()">
+            </div>
+            <div class="col">
+                <label>Rendimento (η)</label>
+                <input type="number" id="mot-rend" value="0.86" step="0.01" min="0.5" max="0.99" oninput="recalcAll()">
+            </div>
+            <div class="col">
+                <label>Ip / In (Pico)</label>
+                <input type="number" id="mot-ipin" value="7" step="0.5" min="3" max="10" oninput="recalcAll()">
+            </div>
+        </div>
+    </div>
+
+    <!-- ABA 1: PARTIDA DIRETA -->
+    <div id="tab-direta" class="section active">
+        <img src="banner-direta.png" class="topic-banner" alt="Partida Direta" onerror="this.style.display='none'">
+
+        <div class="card">
+            <h2>Dimensionamento — Partida Direta</h2>
+            <div class="result-grid">
+                <div class="res-box highlight">
+                    <div class="res-label">Corrente Nominal (In)</div>
+                    <div class="res-val" id="pd-in">-</div>
+                </div>
+                <div class="res-box">
+                    <div class="res-label">Pico de Partida (Ip)</div>
+                    <div class="res-val" id="pd-ip">-</div>
+                </div>
+                <div class="res-box">
+                    <div class="res-label">Contator K1 (AC-3)</div>
+                    <div class="res-val" id="pd-k1">-</div>
+                </div>
+                <div class="res-box">
+                    <div class="res-label">Relé Térmico (Ajuste)</div>
+                    <div class="res-val" id="pd-rt">-</div>
+                </div>
+                <div class="res-box">
+                    <div class="res-label">Disjuntor Motor</div>
+                    <div class="res-val" id="pd-dm">-</div>
+                </div>
+                <div class="res-box">
+                    <div class="res-label">Cabo Cobre (PVC 70°C)</div>
+                    <div class="res-val" id="pd-cabo">-</div>
+                </div>
+            </div>
+
+            <div class="note-box" id="pd-note"></div>
+            <button class="btn btn-success" onclick="shareWhatsApp('direta')">💬 Enviar Lista no WhatsApp</button>
+        </div>
+    </div>
+
+    <!-- ABA 2: ESTRELA-TRIÂNGULO -->
+    <div id="tab-estrela" class="section">
+        <img src="banner-estrela.png" class="topic-banner" alt="Estrela-Triângulo" onerror="this.style.display='none'">
+
+        <div class="card">
+            <h2>Dimensionamento — Estrela-Triângulo (Y-Δ)</h2>
+            <div class="result-grid">
+                <div class="res-box highlight">
+                    <div class="res-label">Corrente Nominal (In)</div>
+                    <div class="res-val" id="et-in">-</div>
+                </div>
+                <div class="res-box">
+                    <div class="res-label">Corrente de Fase (0,58·In)</div>
+                    <div class="res-val" id="et-ifase">-</div>
+                </div>
+                <div class="res-box">
+                    <div class="res-label">K1 (Linha) e K2 (Δ)</div>
+                    <div class="res-val" id="et-k1k2">-</div>
+                </div>
+                <div class="res-box">
+                    <div class="res-label">K3 (Estrela - 0,33·In)</div>
+                    <div class="res-val" id="et-k3">-</div>
+                </div>
+                <div class="res-box">
+                    <div class="res-label">Relé Térmico (na fase)</div>
+                    <div class="res-val" id="et-rt">-</div>
+                </div>
+                <div class="res-box">
+                    <div class="res-label">Disjuntor Geral</div>
+                    <div class="res-val" id="et-dj">-</div>
+                </div>
+                <div class="res-box">
+                    <div class="res-label">Cabo Alimentação (3Ø)</div>
+                    <div class="res-val" id="et-cabo-alim">-</div>
+                </div>
+                <div class="res-box">
+                    <div class="res-label">Cabos p/ Motor (6 fios)</div>
+                    <div class="res-val" id="et-cabo-mot">-</div>
+                </div>
+            </div>
+
+            <div class="note-box">
+                <b>Dica de campo:</b> O motor precisa ser de 6 ou 12 pontas com tensão em Triângulo (Δ) igual à tensão da rede. A partida em Estrela reduz a corrente e o torque de partida para cerca de <b>33%</b> — use apenas para cargas que partem a vazio ou com baixa inércia.
+            </div>
+            <button class="btn btn-success" onclick="shareWhatsApp('estrela')">💬 Enviar Lista no WhatsApp</button>
+        </div>
+    </div>
+
+    <!-- ABA 3: INVERSOR / SOFT-STARTER -->
+    <div id="tab-inv" class="section">
+        <img src="banner-softinv.png" class="topic-banner" alt="Inversor e Soft-Starter" onerror="this.style.display='none'">
+
+        <div class="card">
+            <h2>Dimensionamento — Inversor / Soft-Starter</h2>
+            <div class="result-grid">
+                <div class="res-box highlight">
+                    <div class="res-label">Corrente Nominal (In)</div>
+                    <div class="res-val" id="is-in">-</div>
+                </div>
+                <div class="res-box">
+                    <div class="res-label">Inversor / Soft Mínimo</div>
+                    <div class="res-val" id="is-equip">-</div>
+                </div>
+                <div class="res-box">
+                    <div class="res-label">Disjuntor de Entrada</div>
+                    <div class="res-val" id="is-dj">-</div>
+                </div>
+                <div class="res-box">
+                    <div class="res-label">Contator Bypass (Soft)</div>
+                    <div class="res-val" id="is-bypass">-</div>
+                </div>
+                <div class="res-box">
+                    <div class="res-label">Cabo Entrada / Saída</div>
+                    <div class="res-val" id="is-cabo">-</div>
+                </div>
+                <div class="res-box">
+                    <div class="res-label">Fusível Ultrarrápido</div>
+                    <div class="res-val" id="is-fus">-</div>
+                </div>
+            </div>
+
+            <div class="note-box">
+                <b>Dica de campo:</b> Sempre dimensione o Inversor pela <b>corrente nominal (A)</b> do motor com folga mínima de 10% a 15%, e nunca apenas pelos CVs. Em baixas frequências (&lt; 30 Hz contínuo), verifique se o motor precisa de ventilação forçada.
+            </div>
+            <button class="btn btn-success" onclick="shareWhatsApp('inversor')">💬 Enviar Lista no WhatsApp</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+// Tabelas comerciais padrão (WEG / Siemens / Schneider / NBR 5410 B1 cobre 70°C 3 cond. carregados)
+const CONTATORES = [9, 12, 18, 25, 32, 40, 50, 65, 80, 95, 105, 115, 150, 185, 225, 265, 300, 400];
+const DISJUNTORES = [2, 4, 6, 10, 16, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315, 400];
+const CABOS_B1 = [
+    { mm: '1,5 mm²', amp: 15.5 },
+    { mm: '2,5 mm²', amp: 21 },
+    { mm: '4,0 mm²', amp: 28 },
+    { mm: '6,0 mm²', amp: 36 },
+    { mm: '10 mm²',  amp: 50 },
+    { mm: '16 mm²',  amp: 68 },
+    { mm: '25 mm²',  amp: 89 },
+    { mm: '35 mm²',  amp: 110 },
+    { mm: '50 mm²',  amp: 134 },
+    { mm: '70 mm²',  amp: 171 },
+    { mm: '95 mm²',  amp: 207 },
+    { mm: '120 mm²', amp: 239 },
+    { mm: '150 mm²', amp: 272 },
+    { mm: '185 mm²', amp: 310 }
+];
+
+function nextVal(arr, val) {
+    for (const v of arr) {
+        if (v >= val) return v;
+    }
+    return arr[arr.length - 1] + '+';
+}
+
+function pickCable(amp) {
+    // Folga mínima de 1,15x para motor
+    const req = amp * 1.15;
+    for (const c of CABOS_B1) {
+        if (c.amp >= req) return c.mm;
+    }
+    return '> 185 mm²';
+}
+
+function openTab(tabId, btn) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    btn.classList.add('active');
+}
+
+function getMotorData() {
+    const pot = parseFloat(document.getElementById('mot-pot').value) || 0;
+    const unit = document.getElementById('mot-unit').value;
+    const v = parseFloat(document.getElementById('mot-volt').value) || 220;
+    const fp = parseFloat(document.getElementById('mot-fp').value) || 0.85;
+    const rend = parseFloat(document.getElementById('mot-rend').value) || 0.86;
+    const ipin = parseFloat(document.getElementById('mot-ipin').value) || 7;
+
+    const watts = unit === 'cv' ? pot * 735.5 : pot * 1000;
+    const inNom = watts / (Math.sqrt(3) * v * fp * rend);
+
+    return { pot, unit, v, fp, rend, ipin, inNom };
+}
+
+function recalcAll() {
+    const m = getMotorData();
+    if (m.inNom <= 0 || !isFinite(m.inNom)) return;
+
+    const In = m.inNom;
+    const Ip = In * m.ipin;
+
+    // 1. PARTIDA DIRETA
+    const k1 = nextVal(CONTATORES, In * 1.15);
+    const dm = nextVal(DISJUNTORES, In * 1.25);
+    const caboPD = pickCable(In);
+
+    document.getElementById('pd-in').innerText = `${In.toFixed(1)} A`;
+    document.getElementById('pd-ip').innerText = `${Ip.toFixed(0)} A`;
+    document.getElementById('pd-k1').innerText = `${k1} A (AC-3)`;
+    document.getElementById('pd-rt').innerText = `${In.toFixed(1)} A`;
+    document.getElementById('pd-dm').innerText = `Faixa p/ ${In.toFixed(1)} A (ou DJ ${dm}A)`;
+    document.getElementById('pd-cabo').innerText = caboPD;
+
+    const notePD = document.getElementById('pd-note');
+    if (m.pot > 7.5 && m.unit === 'cv' || (m.pot > 5.5 && m.unit === 'kw')) {
+        notePD.innerHTML = `<b>Atenção:</b> Motor acima de 7,5 CV em Partida Direta gera pico alto (${Ip.toFixed(0)} A). Avalie usar <b>Estrela-Triângulo</b> ou <b>Soft-Starter / Inversor</b> conforme a norma da concessionária.`;
+    } else {
+        notePD.innerHTML = `<b>Dica de campo:</b> Ajuste o relé térmico ou disjuntor motor exatamente na corrente nominal da placa do motor (${In.toFixed(1)} A). Para comando, use disjuntor bipolar de 2 A a 6 A.`;
+    }
+
+    // 2. ESTRELA-TRIÂNGULO
+    const iFase = In * 0.58;
+    const iEstrela = In * 0.33;
+    const k1k2 = nextVal(CONTATORES, iFase * 1.15);
+    const k3 = nextVal(CONTATORES, iEstrela * 1.15);
+    const djET = nextVal(DISJUNTORES, In * 1.25);
+    const caboAlim = pickCable(In);
+    const caboMot = pickCable(iFase);
+
+    document.getElementById('et-in').innerText = `${In.toFixed(1)} A`;
+    document.getElementById('et-ifase').innerText = `${iFase.toFixed(1)} A`;
+    document.getElementById('et-k1k2').innerText = `${k1k2} A (cada)`;
+    document.getElementById('et-k3').innerText = `${k3} A`;
+    document.getElementById('et-rt').innerText = `${iFase.toFixed(1)} A`;
+    document.getElementById('et-dj').innerText = `${djET} A (Curva C/D)`;
+    document.getElementById('et-cabo-alim').innerText = caboAlim;
+    document.getElementById('et-cabo-mot').innerText = caboMot;
+
+    // 3. INVERSOR / SOFT-STARTER
+    const iEquip = In * 1.15;
+    const djInv = nextVal(DISJUNTORES, In * 1.25);
+    const kBypass = nextVal(CONTATORES, In * 1.1);
+    const fusUR = nextVal(DISJUNTORES, In * 1.5);
+
+    document.getElementById('is-in').innerText = `${In.toFixed(1)} A`;
+    document.getElementById('is-equip').innerText = `≥ ${iEquip.toFixed(1)} A`;
+    document.getElementById('is-dj').innerText = `${djInv} A`;
+    document.getElementById('is-bypass').innerText = `${kBypass} A (AC-1/AC-3)`;
+    document.getElementById('is-cabo').innerText = caboAlim;
+    document.getElementById('is-fus').innerText = `${fusUR} A (aR)`;
+}
+
+function shareWhatsApp(tipo) {
+    const m = getMotorData();
+    const uTxt = m.unit.toUpperCase();
+    let txt = `*VoltComando — Dimensionamento*\nMotor: *${m.pot} ${uTxt} / ${m.v}V Trifásico*\nCorrente Nominal: *${m.inNom.toFixed(1)} A*\n\n`;
+
+    if (tipo === 'direta') {
+        txt += `*PARTIDA DIRETA*\n`;
+        txt += `• Contator K1: ${document.getElementById('pd-k1').innerText}\n`;
+        txt += `• Relé Térmico: ${document.getElementById('pd-rt').innerText}\n`;
+        txt += `• Disjuntor: ${document.getElementById('pd-dm').innerText}\n`;
+        txt += `• Cabo Cobre: ${document.getElementById('pd-cabo').innerText}`;
+    } else if (tipo === 'estrela') {
+        txt += `*ESTRELA-TRIÂNGULO*\n`;
+        txt += `• K1 e K2: ${document.getElementById('et-k1k2').innerText}\n`;
+        txt += `• K3 (Estrela): ${document.getElementById('et-k3').innerText}\n`;
+        txt += `• Relé Térmico (fase): ${document.getElementById('et-rt').innerText}\n`;
+        txt += `• Disjuntor Geral: ${document.getElementById('et-dj').innerText}\n`;
+        txt += `• Cabo Alimentação: ${document.getElementById('et-cabo-alim').innerText}\n`;
+        txt += `• Cabos Motor (6 fios): ${document.getElementById('et-cabo-mot').innerText}`;
+    } else {
+        txt += `*INVERSOR / SOFT-STARTER*\n`;
+        txt += `• Corrente Mínima Equip.: ${document.getElementById('is-equip').innerText}\n`;
+        txt += `• Disjuntor Entrada: ${document.getElementById('is-dj').innerText}\n`;
+        txt += `• Contator Bypass: ${document.getElementById('is-bypass').innerText}\n`;
+        txt += `• Cabo Cobre: ${document.getElementById('is-cabo').innerText}`;
+    }
+
+    window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+}
+
+window.addEventListener('DOMContentLoaded', recalcAll);
+
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+
+</body>
+</html>
