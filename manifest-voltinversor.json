@@ -1,0 +1,21 @@
+{
+  "id": "./voltinversor.html",
+  "name": "VoltInversor - Inversores e IHM",
+  "short_name": "VoltInversor",
+  "description": "Guia prático de ligação de inversores de frequência, tabela de bornes (WEG, Schneider, Siemens, Danfoss), IHM Modbus e partida rápida 100% offline.",
+  "start_url": "./voltinversor.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#1e3a8a",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "icone-voltinversor.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
