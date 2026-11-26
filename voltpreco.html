@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1e3a8a">
+<title>VoltPreço - Tabela e Precificação</title>
+<link rel="manifest" href="manifest-voltpreco.json">
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--border:#334155;--primary:#2563eb;--accent:#f59e0b;--cyan:#38bdf8;--ok:#10b981;--err:#ef4444;--txt:#f8fafc;--mut:#94a3b8}
+*{box-sizing:border-box;font-family:'Segoe UI',Roboto,Arial,sans-serif}
+body{margin:0;background:var(--bg);color:var(--txt);padding-bottom:40px}
+header{background:linear-gradient(135deg,#1e3a8a,#0f172a);padding:15px 16px;border-bottom:2px solid var(--accent);position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center}
+header h1{margin:0;font-size:20px;color:var(--accent)}
+header small{color:var(--mut);font-size:12px;display:block}
+.badge{font-size:11px;padding:4px 8px;border-radius:20px;background:rgba(16,185,129,.15);color:var(--ok);border:1px solid rgba(16,185,129,.4);font-weight:700}
+.tabs{display:flex;background:#1e293b;border-bottom:1px solid var(--border);position:sticky;top:63px;z-index:19}
+.tab-btn{flex:1;padding:12px 4px;background:none;border:none;color:var(--mut);font-weight:700;font-size:13px;cursor:pointer;border-bottom:3px solid transparent}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);background:rgba(245,158,11,.08)}
+.container{max-width:740px;margin:0 auto;padding:14px}
+.section{display:none}.section.active{display:block}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px}
+.card h2{margin:0 0 10px;font-size:14px;color:var(--accent);text-transform:uppercase;border-bottom:1px solid var(--border);padding-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+.row{display:flex;gap:8px;flex-wrap:wrap}.col{flex:1;min-width:120px}
+label{display:block;font-size:12px;color:var(--mut);margin-bottom:4px;font-weight:600}
+input,select{width:100%;padding:9px 10px;border-radius:6px;border:1px solid var(--border);background:#0f172a;color:var(--txt);font-size:14px;margin-bottom:8px}
+input:focus,select:focus{outline:none;border-color:var(--accent)}
+.svc-item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--border)}
+.svc-item:last-child{border-bottom:none}
+.svc-info{flex:1;min-width:0}
+.svc-name{font-size:13.5px;font-weight:600;color:var(--txt)}
+.svc-unit{font-size:11.5px;color:var(--mut)}
+.svc-ctrl{display:flex;align-items:center;gap:6px}
+.price-in{width:86px;margin:0;padding:6px 8px;text-align:right;font-weight:700;color:var(--cyan);font-size:14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 12px;border-radius:8px;border:none;font-weight:700;font-size:13.5px;cursor:pointer;color:#fff;width:100%;margin-top:6px}
+.btn-sm{width:auto;margin:0;padding:7px 10px;font-size:12px;border-radius:6px}
+.btn-p{background:var(--primary)}.btn-ok{background:var(--ok)}.btn-acc{background:var(--accent);color:#0f172a}.btn-del{background:rgba(239,68,68,.2);color:#fca5a5;border:1px solid rgba(239,68,68,.4)}
+.cart-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.cart-row:last-child{border-bottom:none}
+.qty-in{width:54px;margin:0;padding:5px;text-align:center}
+.res-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.res-box{background:#0f172a;border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center}
+.res-box.hi{border-color:var(--accent);background:rgba(245,158,11,.1)}
+.res-lbl{font-size:11px;color:var(--mut);text-transform:uppercase}
+.res-val{font-size:20px;font-weight:700;color:var(--cyan);margin-top:4px}
+.res-box.hi .res-val{color:var(--accent)}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ok);color:#fff;padding:9px 16px;border-radius:30px;font-weight:700;font-size:13px;display:none;z-index:99}
+.empty{color:var(--mut);font-size:13px;text-align:center;padding:12px 0}
+@media print{
+header,.tabs,.no-print{display:none!important}
+body{background:#fff;color:#000;padding:0}
+.section{display:none!important}#tab-calc{display:block!important}
+.card,.res-box{background:#fff;color:#000;border-color:#999}
+.res-val{color:#000!important}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>💰 VoltPreço</h1>
+    <small>Precificação — Eletricista &amp; Engenharia</small>
+  </div>
+  <span class="badge">OFFLINE</span>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="openTab('tab-ele',this)">⚡ Eletricista</button>
+  <button class="tab-btn" onclick="openTab('tab-eng',this)">📐 Engenharia</button>
+  <button class="tab-btn" id="btn-tab-calc" onclick="openTab('tab-calc',this)">🧮 Compor (0)</button>
+</div>
+
+<div class="container">
+
+  <!-- ABA 1: ELETRICISTA -->
+  <div id="tab-ele" class="section active">
+    <div class="card">
+      <h2>Serviços de Campo (Valores Editáveis)</h2>
+      <input type="text" id="busca-ele" placeholder="🔍 Filtrar serviço de eletricista..." oninput="renderList('ele')">
+      <div id="list-ele"></div>
+    </div>
+    <div class="card no-print">
+      <h2>+ Cadastrar Novo Serviço (Eletricista)</h2>
+      <div class="row">
+        <div class="col"><label>Descrição</label><input id="new-ele-n" placeholder="Ex.: Instalar fita LED"></div>
+        <div class="col"><label>Unidade</label><input id="new-ele-u" placeholder="un / ponto / m" value="un"></div>
+        <div class="col"><label>Valor (R$)</label><input type="number" id="new-ele-v" placeholder="120" step="any"></div>
+      </div>
+      <button class="btn btn-p" onclick="addService('ele')">Salvar na Tabela Eletricista</button>
+    </div>
+  </div>
+
+  <!-- ABA 2: ENGENHARIA -->
+  <div id="tab-eng" class="section">
+    <div class="card">
+      <h2>Engenharia Elétrica &amp; Laudos (Editáveis)</h2>
+      <input type="text" id="busca-eng" placeholder="🔍 Filtrar serviço de engenharia..." oninput="renderList('eng')">
+      <div id="list-eng"></div>
+    </div>
+    <div class="card no-print">
+      <h2>+ Cadastrar Novo Serviço (Engenharia)</h2>
+      <div class="row">
+        <div class="col"><label>Descrição</label><input id="new-eng-n" placeholder="Ex.: Laudo NBR 5410"></div>
+        <div class="col"><label>Unidade</label><input id="new-eng-u" placeholder="laudo / m² / hora" value="serviço"></div>
+        <div class="col"><label>Valor (R$)</label><input type="number" id="new-eng-v" placeholder="1200" step="any"></div>
+      </div>
+      <button class="btn btn-p" onclick="addService('eng')">Salvar na Tabela Engenharia</button>
+    </div>
+  </div>
+
+  <!-- ABA 3: COMPOSIÇÃO DE PREÇO -->
+  <div id="tab-calc" class="section">
+    <div class="card">
+      <h2>Cliente &amp; Itens Selecionados <button class="btn btn-sm btn-del no-print" onclick="clearCart()">Limpar</button></h2>
+      <input id="c-cliente" placeholder="Nome do cliente / empresa (opcional)">
+      <div id="cart-list"></div>
+    </div>
+
+    <div class="card">
+      <h2>Custos Reais &amp; Margem</h2>
+      <div class="row">
+        <div class="col"><label>Mão de Obra Extra (R$)</label><input type="number" id="c-extra" value="0" step="any" oninput="calcTotal()"></div>
+        <div class="col"><label>Materiais / Insumos (R$)</label><input type="number" id="c-mat" value="0" step="any" oninput="calcTotal()"></div>
+      </div>
+      <div class="row">
+        <div class="col"><label>Deslocamento (km ida+volta)</label><input type="number" id="c-km" value="0" step="any" oninput="calcTotal()"></div>
+        <div class="col"><label>Custo por km (R$)</label><input type="number" id="c-kmval" value="2.50" step="any" oninput="calcTotal()"></div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <label>Complexidade / Risco</label>
+          <select id="c-fator" onchange="calcTotal()">
+            <option value="1">Normal (1,0x)</option>
+            <option value="1.2">Altura / Acesso difícil (+20%)</option>
+            <option value="1.35">Urgência / Emergência (+35%)</option>
+            <option value="1.5">Noturno / Fim de semana (+50%)</option>
+          </select>
+        </div>
+        <div class="col"><label>Taxa ART / Despesas (R$)</label><input type="number" id="c-art" value="0" step="any" oninput="calcTotal()"></div>
+      </div>
+      <div class="row">
+        <div class="col"><label>Imposto / NF (%)</label><input type="number" id="c-imp" value="0" step="any" oninput="calcTotal()"></div>
+        <div class="col"><label>Margem / Reserva (%)</label><input type="number" id="c-marg" value="15" step="any" oninput="calcTotal()"></div>
+      </div>
+
+      <div class="res-grid">
+        <div class="res-box">
+          <div class="res-lbl">Valor Mínimo (Custo)</div>
+          <div class="res-val" id="res-min">R$ 0,00</div>
+        </div>
+        <div class="res-box hi">
+          <div class="res-lbl">Preço Sugerido</div>
+          <div class="res-val" id="res-sug">R$ 0,00</div>
+        </div>
+      </div>
+
+      <button class="btn btn-ok no-print" onclick="shareWhats()">💬 Enviar Valor no WhatsApp</button>
+      <button class="btn btn-p no-print" onclick="window.print()">🖨️ Salvar / Imprimir PDF</button>
+    </div>
+
+    <div class="card no-print">
+      <h2>Restaurar Padrão</h2>
+      <button class="btn btn-del" onclick="resetDefaults()">↺ Restaurar Tabelas Originais</button>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const DEFAULT_DB = {
+  ele: [
+    {id:'e1', n:'Visita técnica / Diagnóstico de falha', u:'visita', v:120},
+    {id:'e2', n:'Troca de tomada ou interruptor simples', u:'ponto', v:60},
+    {id:'e3', n:'Instalação de ventilador de teto', u:'un', v:180},
+    {id:'e4', n:'Instalação de chuveiro elétrico (sem puxar fio)', u:'un', v:130},
+    {id:'e5', n:'Passagem de circuito novo p/ chuveiro ou AC', u:'circuito', v:320},
+    {id:'e6', n:'Troca de disjuntor / instalação de DR ou DPS', u:'un', v:120},
+    {id:'e7', n:'Montagem e organização de QDC (até 12 disj.)', u:'quadro', v:650},
+    {id:'e8', n:'Instalação de luminária / refletor / fotocélula', u:'un', v:110},
+    {id:'e9', n:'Instalação de boia elétrica (caixa/cisterna)', u:'un', v:180},
+    {id:'e10', n:'Diária técnica de eletricista (8h)', u:'diária', v:380}
+  ],
+  eng: [
+    {id:'g1', n:'Visita técnica de Engenharia + Parecer', u:'visita', v:350},
+    {id:'g2', n:'Emissão de ART (honorário + guia)', u:'ART', v:450},
+    {id:'g3', n:'Levantamento de carga e demanda elétrica', u:'serviço', v:900},
+    {id:'g4', n:'Inspeção e Relatório de SPDA (NBR 5419)', u:'laudo', v:1500},
+    {id:'g5', n:'Laudo de Aterramento / Medição Terrômetro', u:'laudo', v:850},
+    {id:'g6', n:'Projeto Elétrico Residencial / Comercial', u:'m²', v:22},
+    {id:'g7', n:'Projeto de Entrada / Medição (Concessionária)', u:'projeto', v:1800},
+    {id:'g8', n:'Termografia em quadros elétricos + Relatório', u:'quadro', v:450},
+    {id:'g9', n:'Preventiva / Laudo de Subestação Simplificada', u:'serviço', v:2800},
+    {id:'g10', n:'Hora técnica de Engenharia / Consultoria', u:'hora', v:180}
+  ]
+};
+
+let db = JSON.parse(localStorage.getItem('voltpreco_db')) || JSON.parse(JSON.stringify(DEFAULT_DB));
+let cart = [];
+
+const brl = v => 'R$ ' + (Number(v)||0).toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.innerText=msg; t.style.display='block';
+  setTimeout(()=>t.style.display='none',1800);
+}
+
+function saveDB(){ localStorage.setItem('voltpreco_db', JSON.stringify(db)); }
+
+function openTab(id, btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='tab-calc'){ renderCart(); calcTotal(); }
+}
+
+function renderList(cat){
+  const q = (document.getElementById('busca-'+cat).value||'').toLowerCase();
+  const el = document.getElementById('list-'+cat);
+  const items = db[cat].filter(i => i.n.toLowerCase().includes(q));
+  if(!items.length){ el.innerHTML='<div class="empty">Nenhum serviço encontrado.</div>'; return; }
+  el.innerHTML = items.map(i => `
+    <div class="svc-item">
+      <div class="svc-info">
+        <div class="svc-name">${i.n}</div>
+        <div class="svc-unit">por ${i.u}</div>
+      </div>
+      <div class="svc-ctrl">
+        <input type="number" class="price-in" value="${i.v}" step="any" onchange="updatePrice('${cat}','${i.id}',this.value)">
+        <button class="btn btn-sm btn-acc" onclick="addToCart('${cat}','${i.id}')">+ Orçar</button>
+        <button class="btn btn-sm btn-del" onclick="delService('${cat}','${i.id}')">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+function updatePrice(cat, id, val){
+  const it = db[cat].find(x=>x.id===id);
+  if(it){ it.v = parseFloat(val)||0; saveDB(); toast('Valor atualizado!'); }
+}
+
+function addService(cat){
+  const n = document.getElementById('new-'+cat+'-n').value.trim();
+  const u = document.getElementById('new-'+cat+'-u').value.trim() || 'un';
+  const v = parseFloat(document.getElementById('new-'+cat+'-v').value);
+  if(!n || isNaN(v)){ toast('Preencha descrição e valor.'); return; }
+  db[cat].unshift({id:cat+Date.now(), n, u, v});
+  saveDB();
+  document.getElementById('new-'+cat+'-n').value='';
+  document.getElementById('new-'+cat+'-v').value='';
+  renderList(cat);
+  toast('Serviço salvo na tabela!');
+}
+
+function delService(cat, id){
+  if(!confirm('Remover este serviço da tabela?')) return;
+  db[cat] = db[cat].filter(x=>x.id!==id);
+  saveDB(); renderList(cat);
+}
+
+function addToCart(cat, id){
+  const it = db[cat].find(x=>x.id===id);
+  if(!it) return;
+  const ex = cart.find(c=>c.id===id);
+  if(ex) ex.qtd++; else cart.push({id:it.id, n:it.n, u:it.u, v:it.v, qtd:1});
+  updateCartBadge();
+  toast('+1 adicionado à composição!');
+}
+
+function updateCartBadge(){
+  const tot = cart.reduce((s,c)=>s+c.qtd,0);
+  document.getElementById('btn-tab-calc').innerText = `🧮 Compor (${tot})`;
+}
+
+function renderCart(){
+  const el = document.getElementById('cart-list');
+  if(!cart.length){
+    el.innerHTML='<div class="empty">Toque em <b>+ Orçar</b> nas abas Eletricista ou Engenharia, ou preencha a Mão de Obra Extra abaixo.</div>';
+    return;
+  }
+  el.innerHTML = cart.map((c,idx)=>`
+    <div class="cart-row">
+      <div style="flex:1"><b>${c.n}</b><br><small style="color:#94a3b8">${brl(c.v)} / ${c.u}</small></div>
+      <input type="number" class="qty-in" min="0.5" step="any" value="${c.qtd}" oninput="cart[${idx}].qtd=parseFloat(this.value)||0;calcTotal();updateCartBadge()">
+      <button class="btn btn-sm btn-del no-print" onclick="cart.splice(${idx},1);renderCart();calcTotal();updateCartBadge()">✕</button>
+    </div>`).join('');
+}
+
+function clearCart(){
+  cart=[]; renderCart(); calcTotal(); updateCartBadge();
+}
+
+function calcTotal(){
+  const sumCart = cart.reduce((s,c)=>s+(c.v*c.qtd),0);
+  const extra = parseFloat(document.getElementById('c-extra').value)||0;
+  const mat = parseFloat(document.getElementById('c-mat').value)||0;
+  const km = (parseFloat(document.getElementById('c-km').value)||0) * (parseFloat(document.getElementById('c-kmval').value)||0);
+  const fator = parseFloat(document.getElementById('c-fator').value)||1;
+  const art = parseFloat(document.getElementById('c-art').value)||0;
+  const imp = (parseFloat(document.getElementById('c-imp').value)||0)/100;
+  const marg = (parseFloat(document.getElementById('c-marg').value)||0)/100;
+
+  const servComFator = (sumCart + extra) * fator;
+  const baseCusto = servComFator + mat + km + art;
+  const minimo = baseCusto * (1 + imp);
+  const sugerido = baseCusto * (1 + marg + imp);
+
+  document.getElementById('res-min').innerText = brl(minimo);
+  document.getElementById('res-sug').innerText = brl(sugerido);
+  return {sumCart,extra,mat,km,fator,art,minimo,sugerido};
+}
+
+function shareWhats(){
+  const cli = document.getElementById('c-cliente').value.trim();
+  const r = calcTotal();
+  let txt = `*VoltPreço — Estimativa de Serviço*\n`;
+  if(cli) txt += `Cliente: ${cli}\n`;
+  if(cart.length){
+    txt += `\n*Serviços:*\n`;
+    cart.forEach(c => txt += `• ${c.qtd}x ${c.n} (${brl(c.v*c.qtd)})\n`);
+  }
+  if(r.extra>0) txt += `• Mão de obra adicional: ${brl(r.extra)}\n`;
+  if(r.mat>0) txt += `• Materiais/Insumos: ${brl(r.mat)}\n`;
+  if(r.km>0) txt += `• Deslocamento: ${brl(r.km)}\n`;
+  if(r.art>0) txt += `• Taxa ART / Despesas: ${brl(r.art)}\n`;
+  txt += `\n*Valor Total Estimado: ${brl(r.sugerido)}*`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`,'_blank');
+}
+
+function resetDefaults(){
+  if(!confirm('Voltar todos os preços para a tabela original?')) return;
+  db = JSON.parse(JSON.stringify(DEFAULT_DB));
+  saveDB(); renderList('ele'); renderList('eng');
+  toast('Tabelas restauradas!');
+}
+
+window.addEventListener('DOMContentLoaded',()=>{
+  renderList('ele'); renderList('eng'); renderCart(); calcTotal();
+});
+
+if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catch(()=>{}); }
+</script>
+</body>
+</html>
