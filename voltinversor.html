@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1e3a8a">
+<title>VoltInversor - Inversores e IHM</title>
+<link rel="manifest" href="manifest-voltinversor.json">
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--bd:#334155;--pri:#2563eb;--acc:#f59e0b;--cy:#38bdf8;--ok:#10b981;--err:#ef4444;--txt:#f8fafc;--mut:#94a3b8}
+*{box-sizing:border-box;font-family:'Segoe UI',Roboto,Arial,sans-serif}
+body{margin:0;background:var(--bg);color:var(--txt);padding-bottom:36px}
+header{background:linear-gradient(135deg,#1e3a8a,#0f172a);padding:15px 16px;border-bottom:2px solid var(--acc);position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center}
+header h1{margin:0;font-size:20px;color:var(--acc)}
+header small{color:var(--mut);font-size:12px;display:block}
+.badge{font-size:11px;padding:4px 8px;border-radius:20px;background:rgba(16,185,129,.15);color:var(--ok);border:1px solid rgba(16,185,129,.4);font-weight:700}
+.tabs{display:flex;background:#1e293b;border-bottom:1px solid var(--bd);position:sticky;top:63px;z-index:19;overflow-x:auto}
+.tab-btn{flex:1;min-width:86px;padding:12px 6px;background:none;border:none;color:var(--mut);font-weight:700;font-size:12.5px;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+.tab-btn.active{color:var(--acc);border-bottom-color:var(--acc);background:rgba(245,158,11,.08)}
+.wrap{max-width:740px;margin:0 auto;padding:14px}
+.sec{display:none}.sec.active{display:block}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:14px;margin-bottom:14px}
+.card h2{margin:0 0 10px;font-size:14px;color:var(--acc);text-transform:uppercase;border-bottom:1px solid var(--bd);padding-bottom:6px}
+.svg-box{background:#091020;border:1px solid var(--bd);border-radius:8px;padding:8px;margin-bottom:10px}
+.svg-box svg{width:100%;height:auto;display:block}
+ol,ul{margin:0;padding-left:18px;font-size:13.5px;line-height:1.55;color:#e2e8f0}
+li{margin-bottom:6px}
+.tip{margin-top:10px;padding:10px;border-radius:8px;font-size:12.5px;line-height:1.45;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.35);color:#e0f2fe}
+.warn{margin-top:10px;padding:10px;border-radius:8px;font-size:12.5px;line-height:1.45;background:rgba(239,68,68,.14);border:1px solid rgba(239,68,68,.45);color:#fecaca}
+.brand-bar{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.b-btn{padding:10px 8px;border-radius:8px;border:1px solid var(--bd);background:#0f172a;color:var(--mut);font-weight:700;font-size:12.5px;cursor:pointer}
+.b-btn.active{background:var(--pri);border-color:var(--cy);color:#fff}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:8px 6px;border-bottom:1px solid var(--bd);text-align:left}
+th{color:var(--acc);background:#0f172a;font-size:12px}
+.tag-b{display:inline-block;padding:2px 7px;border-radius:5px;background:#0f172a;border:1px solid var(--cy);color:var(--cy);font-weight:700;font-size:12px}
+.btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:11px;border-radius:8px;border:none;font-weight:700;font-size:14px;cursor:pointer;color:#fff;width:100%;margin-top:10px}
+.btn-ok{background:var(--ok)}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🎛️ VoltInversor</h1>
+    <small>Inversores de Frequência &amp; IHM</small>
+  </div>
+  <span class="badge">OFFLINE</span>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="openTab('t-lig',this)">⚡ Ligação</button>
+  <button class="tab-btn" onclick="openTab('t-mar',this)">🏷️ Marcas</button>
+  <button class="tab-btn" onclick="openTab('t-ihm',this)">🖥️ IHM / Modbus</button>
+  <button class="tab-btn" onclick="openTab('t-par',this)">⚙️ Parâmetros</button>
+</div>
+
+<div class="wrap">
+
+  <!-- ABA 1: POTÊNCIA E COMANDO -->
+  <div id="t-lig" class="sec active">
+    <div class="card">
+      <h2>Potência + Comando 2 Fios + Potenciômetro</h2>
+      <div class="svg-box">
+        <svg viewBox="0 0 360 225">
+          <!-- Entrada Rede -->
+          <rect x="8" y="16" width="68" height="46" rx="5" fill="#1e293b" stroke="#ef4444" stroke-width="1.6"/>
+          <text x="42" y="34" fill="#ef4444" font-size="9" text-anchor="middle" font-weight="bold">DISJUNTOR</text>
+          <text x="42" y="49" fill="#94a3b8" font-size="8" text-anchor="middle">L1 / L2 / L3</text>
+          <line x1="76" y1="32" x2="112" y2="32" stroke="#ef4444" stroke-width="2.2"/>
+          <line x1="76" y1="40" x2="112" y2="40" stroke="#f59e0b" stroke-width="2.2"/>
+          <line x1="76" y1="48" x2="112" y2="48" stroke="#38bdf8" stroke-width="2.2"/>
+
+          <!-- Bloco Inversor -->
+          <rect x="112" y="12" width="136" height="196" rx="8" fill="#0f172a" stroke="#f59e0b" stroke-width="2"/>
+          <text x="180" y="30" fill="#f59e0b" font-size="11" text-anchor="middle" font-weight="bold">INVERSOR (VFD)</text>
+          <text x="118" y="45" fill="#ef4444" font-size="8">L1 L2 L3</text>
+          <text x="210" y="45" fill="#10b981" font-size="8">U  V  W</text>
+          <line x1="118" y1="54" x2="242" y2="54" stroke="#334155" stroke-width="1"/>
+
+          <!-- Bornes Comando -->
+          <text x="180" y="69" fill="#38bdf8" font-size="9" text-anchor="middle" font-weight="bold">RÉGUA DE COMANDO</text>
+          <text x="120" y="88" fill="#f8fafc" font-size="8.5">+24V</text>
+          <text x="120" y="106" fill="#facc15" font-size="8.5">DI1 (Gira/Para)</text>
+          <text x="120" y="124" fill="#c084fc" font-size="8.5">DI2 (Reversão)</text>
+          <line x1="118" y1="134" x2="242" y2="134" stroke="#334155" stroke-width="1"/>
+          <text x="120" y="150" fill="#ef4444" font-size="8.5">+10V (Ref.)</text>
+          <text x="120" y="168" fill="#38bdf8" font-size="8.5">AI1 (Meio)</text>
+          <text x="120" y="186" fill="#94a3b8" font-size="8.5">GND / 0V</text>
+          <text x="180" y="202" fill="#22c55e" font-size="8.5" text-anchor="middle" font-weight="bold">PE (TERRA OBRIGATÓRIO)</text>
+
+          <!-- Saída Motor -->
+          <line x1="248" y1="32" x2="288" y2="32" stroke="#10b981" stroke-width="2.2"/>
+          <line x1="248" y1="40" x2="288" y2="40" stroke="#10b981" stroke-width="2.2"/>
+          <line x1="248" y1="48" x2="288" y2="48" stroke="#10b981" stroke-width="2.2"/>
+          <circle cx="316" cy="42" r="26" fill="#1e293b" stroke="#10b981" stroke-width="2"/>
+          <text x="316" y="40" fill="#10b981" font-size="9.5" text-anchor="middle" font-weight="bold">MOTOR</text>
+          <text x="316" y="52" fill="#94a3b8" font-size="8" text-anchor="middle">3Ø (U,V,W)</text>
+
+          <!-- Chave Seletora -->
+          <rect x="8" y="82" width="68" height="46" rx="5" fill="#1e293b" stroke="#facc15" stroke-width="1.5"/>
+          <text x="42" y="100" fill="#facc15" font-size="8.5" text-anchor="middle" font-weight="bold">SELETORA</text>
+          <text x="42" y="114" fill="#94a3b8" font-size="7.5" text-anchor="middle">NA (2 fios)</text>
+          <polyline points="112,85 88,85 88,96 76,96" fill="none" stroke="#f8fafc" stroke-width="1.8"/>
+          <polyline points="76,112 96,112 96,103 112,103" fill="none" stroke="#facc15" stroke-width="1.8"/>
+
+          <!-- Potenciômetro -->
+          <rect x="8" y="142" width="68" height="52" rx="5" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+          <text x="42" y="160" fill="#38bdf8" font-size="8" text-anchor="middle" font-weight="bold">POTENC.</text>
+          <text x="42" y="173" fill="#f8fafc" font-size="8" text-anchor="middle">5k ou 10k Ω</text>
+          <text x="42" y="185" fill="#94a3b8" font-size="7.5" text-anchor="middle">Linear</text>
+          <line x1="76" y1="148" x2="112" y2="148" stroke="#ef4444" stroke-width="1.8"/>
+          <line x1="76" y1="165" x2="112" y2="165" stroke="#38bdf8" stroke-width="1.8"/>
+          <line x1="76" y1="183" x2="112" y2="183" stroke="#94a3b8" stroke-width="1.8"/>
+
+          <!-- Dica Blindagem -->
+          <rect x="262" y="104" width="90" height="86" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1.4"/>
+          <text x="307" y="122" fill="#f59e0b" font-size="8.5" text-anchor="middle" font-weight="bold">CHÃO DE FÁBRICA</text>
+          <text x="307" y="139" fill="#e2e8f0" font-size="7.5" text-anchor="middle">• Separe cabos</text>
+          <text x="307" y="151" fill="#e2e8f0" font-size="7.5" text-anchor="middle">U,V,W do comando</text>
+          <text x="307" y="167" fill="#e2e8f0" font-size="7.5" text-anchor="middle">• Malha aterrada</text>
+          <text x="307" y="179" fill="#e2e8f0" font-size="7.5" text-anchor="middle">só de 1 lado</text>
+        </svg>
+      </div>
+      <ol>
+        <li><b>Potência:</b> Rede entra em <b>L1, L2, L3</b> (monofásico usa L1 e L2) após disjuntor. Motor liga direto em <b>U, V, W</b>.</li>
+        <li><b>Comando 2 fios:</b> Saia do <b>+24V</b>, passe pelo contato NA da seletora e volte em <b>DI1</b> (Gira/Para). Para reversão, puxe outro ramo do +24V para <b>DI2</b>.</li>
+        <li><b>Potenciômetro (5 kΩ ou 10 kΩ):</b> Ponta 1 no <b>+10V</b>, pino central (cursor) em <b>AI1</b> e Ponta 3 no <b>GND/0V</b>.</li>
+      </ol>
+      <div class="warn">
+        <b>Cuidado crítico:</b> Nunca inverta entrada (L1/L2/L3) com saída (U/V/W) — queima o módulo IGBT na hora. Nunca coloque relé térmico nem contator abrindo em carga na saída do inversor.
+      </div>
+    </div>
+  </div>
+
+  <!-- ABA 2: BORNES POR MARCA -->
+  <div id="t-mar" class="sec">
+    <div class="card">
+      <h2>Selecione o Fabricante / Linha</h2>
+      <div class="brand-bar">
+        <button class="b-btn active" onclick="showBrand('weg',this)">WEG CFW300 / 500</button>
+        <button class="b-btn" onclick="showBrand('sch',this)">Schneider ATV12 / 320</button>
+        <button class="b-btn" onclick="showBrand('sie',this)">Siemens SINAMICS V20</button>
+        <button class="b-btn" onclick="showBrand('dan',this)">Danfoss VLT FC51</button>
+      </div>
+      <div id="brand-table"></div>
+      <div class="tip" id="brand-tip"></div>
+    </div>
+  </div>
+
+  <!-- ABA 3: IHM E MODBUS -->
+  <div id="t-ihm" class="sec">
+    <div class="card">
+      <h2>Rede RS-485 (IHM Touch + Inversores em Modbus RTU)</h2>
+      <div class="svg-box">
+        <svg viewBox="0 0 360 148">
+          <!-- IHM -->
+          <rect x="10" y="24" width="84" height="62" rx="6" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+          <text x="52" y="46" fill="#38bdf8" font-size="10" text-anchor="middle" font-weight="bold">IHM TOUCH</text>
+          <text x="52" y="61" fill="#f8fafc" font-size="8" text-anchor="middle">Mestre Modbus</text>
+          <text x="52" y="75" fill="#facc15" font-size="8" text-anchor="middle">A(+) / B(-)</text>
+
+          <!-- INV 1 -->
+          <rect x="136" y="24" width="82" height="62" rx="6" fill="#1e293b" stroke="#f59e0b" stroke-width="1.8"/>
+          <text x="177" y="46" fill="#f59e0b" font-size="9.5" text-anchor="middle" font-weight="bold">INVERSOR 1</text>
+          <text x="177" y="61" fill="#f8fafc" font-size="8" text-anchor="middle">Slave ID: 1</text>
+          <text x="177" y="75" fill="#94a3b8" font-size="8" text-anchor="middle">A(+) / B(-)</text>
+
+          <!-- INV 2 -->
+          <rect x="256" y="24" width="82" height="62" rx="6" fill="#1e293b" stroke="#f59e0b" stroke-width="1.8"/>
+          <text x="297" y="46" fill="#f59e0b" font-size="9.5" text-anchor="middle" font-weight="bold">INVERSOR 2</text>
+          <text x="297" y="61" fill="#f8fafc" font-size="8" text-anchor="middle">Slave ID: 2</text>
+          <text x="297" y="75" fill="#94a3b8" font-size="8" text-anchor="middle">A(+) / B(-)</text>
+
+          <!-- Barramento A e B -->
+          <line x1="94" y1="48" x2="136" y2="48" stroke="#facc15" stroke-width="2.2"/>
+          <line x1="94" y1="64" x2="136" y2="64" stroke="#38bdf8" stroke-width="2.2"/>
+          <line x1="218" y1="48" x2="256" y2="48" stroke="#facc15" stroke-width="2.2"/>
+          <line x1="218" y1="64" x2="256" y2="64" stroke="#38bdf8" stroke-width="2.2"/>
+
+          <!-- Resistor 120R -->
+          <line x1="338" y1="48" x2="350" y2="48" stroke="#facc15" stroke-width="2"/>
+          <line x1="338" y1="64" x2="350" y2="64" stroke="#38bdf8" stroke-width="2"/>
+          <line x1="350" y1="48" x2="350" y2="64" stroke="#ef4444" stroke-width="3"/>
+          <text x="334" y="102" fill="#ef4444" font-size="8" text-anchor="middle" font-weight="bold">120 Ω no último</text>
+
+          <text x="180" y="128" fill="#94a3b8" font-size="8.5" text-anchor="middle">Cabo par trançado blindado — ligação em cascata (sem estrela)</text>
+        </svg>
+      </div>
+      <ul>
+        <li><b>IHM Remota do próprio Inversor:</b> Usa kit de moldura + cabo serial/RJ45 do fabricante para fixar a telinha na porta do painel, evitando abrir o quadro energizado.</li>
+        <li><b>IHM Touch Externa (Modbus RTU):</b> Ligue em cascata (ponto a ponto): <b>A+ com A+</b> e <b>B- com B-</b>. Se não comunicar, teste inverter A e B (algumas marcas invertem a nomenclatura).</li>
+        <li><b>Regra de Ouro Modbus:</b> Todos os aparelhos precisam do mesmo <b>Baud Rate</b> (ex.: 9600 ou 19200 bps) e mesmo formato (<b>8N1</b> ou <b>8E1</b>). Apenas o <b>Endereço (Slave ID)</b> muda em cada inversor (1, 2, 3...).</li>
+        <li><b>Terminação:</b> Ative o resistor de <b>120 Ω</b> apenas no último inversor da rede.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ABA 4: PARTIDA RÁPIDA -->
+  <div id="t-par" class="sec">
+    <div class="card">
+      <h2>Checklist de Partida Rápida (Comissionamento)</h2>
+      <p style="font-size:12.5px;color:#94a3b8;margin-top:0">Parâmetros essenciais antes de rodar o motor (exemplos com código da linha WEG CFW300/500):</p>
+      <table>
+        <thead><tr><th>Ajuste Obrigatório</th><th>O que colocar</th><th>Ref. WEG</th></tr></thead>
+        <tbody>
+          <tr><td><b>Tensão do Motor</b></td><td>Tensão da placa (220/380V)</td><td><span class="tag-b">P0400</span></td></tr>
+          <tr><td><b>Corrente Nominal</b></td><td>Corrente da placa (In)</td><td><span class="tag-b">P0401</span></td></tr>
+          <tr><td><b>Rotação Nominal</b></td><td>RPM da placa (ex.: 1750)</td><td><span class="tag-b">P0402</span></td></tr>
+          <tr><td><b>Freq. Nominal</b></td><td>60 Hz (padrão Brasil)</td><td><span class="tag-b">P0403</span></td></tr>
+          <tr><td><b>Rampa Aceleração</b></td><td>Ex.: 5 a 15 segundos</td><td><span class="tag-b">P0100</span></td></tr>
+          <tr><td><b>Rampa Desacel.</b></td><td>Ex.: 5 a 15 segundos</td><td><span class="tag-b">P0101</span></td></tr>
+          <tr><td><b>Freq. Mín. / Máx.</b></td><td>Ex.: 15 Hz a 60 Hz</td><td><span class="tag-b">P0133 / 134</span></td></tr>
+          <tr><td><b>Comando Remoto</b></td><td>Bornes (DIx) ou Serial/IHM</td><td><span class="tag-b">P0220 / 224</span></td></tr>
+          <tr><td><b>Ref. Velocidade</b></td><td>Potenciômetro (AI1) / Serial</td><td><span class="tag-b">P0222</span></td></tr>
+        </tbody>
+      </table>
+      <div class="tip">
+        <b>Dica de bancada:</b> Em motores comuns com ventilação acoplada no eixo, evite trabalhar contínuo abaixo de <b>25–30 Hz</b> sem ventilação forçada, pois o motor aquece por falta de vento.
+      </div>
+      <button class="btn btn-ok" onclick="shareGuide()">💬 Enviar Checklist de Partida no WhatsApp</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const BRANDS = {
+  weg: {
+    rows: [
+      ['Entrada Rede','L1 / L2 / L3'],
+      ['Saída Motor','U / V / W'],
+      ['Fonte Comando','+24V (borne 9 ou 11)'],
+      ['Gira / Para','DI1 (borne 1)'],
+      ['Reversão','DI2 (borne 2)'],
+      ['Potenciômetro (+10V)','+10V'],
+      ['Potenciômetro (Meio)','AI1'],
+      ['Potenciômetro (0V)','GND'],
+      ['RS-485 (Modbus)','A(-) / B(+) via módulo plug-in']
+    ],
+    tip: '<b>Dica WEG (CFW300/500):</b> Confira sempre a chave/parâmetro <b>PNP vs NPN</b>. No padrão Brasil (PNP), as entradas digitais fecham com <b>+24V</b>. Para ligar por bornes, ajuste P0220 = Remoto e P0224 = DIx.'
+  },
+  sch: {
+    rows: [
+      ['Entrada Rede','R/L1, S/L2, T/L3'],
+      ['Saída Motor','U/T1, V/T2, W/T3'],
+      ['Fonte Comando','+24V'],
+      ['Gira / Para','LI1 (ou DI1)'],
+      ['Reversão','LI2 (ou DI2)'],
+      ['Potenciômetro (+10V)','+10V'],
+      ['Potenciômetro (Meio)','AI1'],
+      ['Potenciômetro (0V)','COM'],
+      ['RS-485 (Modbus)','Porta RJ45 integrada (pinos 4=D1, 5=D0)']
+    ],
+    tip: '<b>Dica Schneider (ATV12/320):</b> Confira a chavinha lateral <b>SRC / SINK</b> (use SRC para acionar com +24V). A porta RJ45 já fala Modbus RTU direto com IHM.'
+  },
+  sie: {
+    rows: [
+      ['Entrada Rede','L1 / L2 / L3'],
+      ['Saída Motor','U / V / W'],
+      ['Fonte Comando','24V (borne 13)'],
+      ['Gira / Para','DI1 (borne 8)'],
+      ['Reversão','DI2 (borne 9)'],
+      ['Potenciômetro (+10V)','10V (borne 1)'],
+      ['Potenciômetro (Meio)','AI1 (borne 2)'],
+      ['Potenciômetro (0V)','0V (borne 4)'],
+      ['RS-485 (Modbus)','P+ (borne 16) / N- (borne 17)']
+    ],
+    tip: '<b>Dica Siemens (SINAMICS V20):</b> Para comando PNP com 24V interno, faça o jumper entre <b>DIC (borne 12)</b> e <b>0V (borne 14)</b>. Use as macros de conexão (Cn002 = comando por bornes + potenciômetro).'
+  },
+  dan: {
+    rows: [
+      ['Entrada Rede','91 (L1) / 92 (L2) / 93 (L3)'],
+      ['Saída Motor','96 (U) / 97 (V) / 98 (W)'],
+      ['Fonte Comando','+24V (borne 12)'],
+      ['Gira / Para','DI1 (borne 18)'],
+      ['Reversão','DI2 (borne 19)'],
+      ['Potenciômetro (+10V)','+10V (borne 50)'],
+      ['Potenciômetro (Meio)','AI53 (borne 53)'],
+      ['Potenciômetro (0V)','GND (borne 55)'],
+      ['RS-485 (Modbus)','68 (+) / 69 (-)']
+    ],
+    tip: '<b>Dica Danfoss (VLT FC51):</b> Confira a chavinha atrás da IHM (S200) para selecionar entrada analógica 53 em <b>U (0–10V)</b> para potenciômetro ou <b>I (4–20mA)</b> para sensor.'
+  }
+};
+
+function openTab(id, btn){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function showBrand(key, btn){
+  document.querySelectorAll('.b-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  const b = BRANDS[key];
+  document.getElementById('brand-table').innerHTML =
+    '<table><thead><tr><th>Função</th><th>Borne</th></tr></thead><tbody>' +
+    b.rows.map(r=>`<tr><td>${r[0]}</td><td><span class="tag-b">${r[1]}</span></td></tr>`).join('') +
+    '</tbody></table>';
+  document.getElementById('brand-tip').innerHTML = b.tip;
+}
+
+function shareGuide(){
+  const txt = `*VoltInversor — Checklist Partida Rápida*\n• Dados da placa: Tensão, Corrente (In), RPM e 60 Hz\n• Rampas: Aceleração / Desaceleração (5 a 15s)\n• Comando 2 fios: +24V -> Seletora NA -> DI1\n• Potenciômetro: +10V / AI1 (meio) / GND\n• Modbus RS-485: A+ com A+, B- com B-, 120 Ω no último`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`,'_blank');
+}
+
+window.addEventListener('DOMContentLoaded',()=>showBrand('weg',document.querySelector('.b-btn')));
+if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catch(()=>{}); }
+</script>
+</body>
+</html>
