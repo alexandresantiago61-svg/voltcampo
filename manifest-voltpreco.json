@@ -1,0 +1,21 @@
+{
+  "id": "./voltpreco.html",
+  "name": "VoltPreço - Tabela e Precificação",
+  "short_name": "VoltPreço",
+  "description": "Tabela editável e precificação de serviços de Eletricista e Engenharia Elétrica 100% offline.",
+  "start_url": "./voltpreco.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#1e3a8a",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "icone-voltpreco.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
